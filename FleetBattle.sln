@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FleetBattle", "FleetBattle.vcxproj", "{A955F470-1329-4364-81B7-D775561D6093}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A955F470-1329-4364-81B7-D775561D6093}.Debug|x64.ActiveCfg = Debug|x64
+		{A955F470-1329-4364-81B7-D775561D6093}.Debug|x64.Build.0 = Debug|x64
+		{A955F470-1329-4364-81B7-D775561D6093}.Debug|x86.ActiveCfg = Debug|Win32
+		{A955F470-1329-4364-81B7-D775561D6093}.Debug|x86.Build.0 = Debug|Win32
+		{A955F470-1329-4364-81B7-D775561D6093}.Release|x64.ActiveCfg = Release|x64
+		{A955F470-1329-4364-81B7-D775561D6093}.Release|x64.Build.0 = Release|x64
+		{A955F470-1329-4364-81B7-D775561D6093}.Release|x86.ActiveCfg = Release|Win32
+		{A955F470-1329-4364-81B7-D775561D6093}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {693D3A2F-55B8-42C3-9D28-54996A80985C}
+	EndGlobalSection
+EndGlobal
