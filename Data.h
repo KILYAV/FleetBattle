@@ -1,9 +1,9 @@
 #pragma once
+#include <random>
+#include <iostream>
 #include <windows.h>
 
 namespace domain {
-	//using UINT = unsigned;
-
 	enum class Size {
 		size_10 = 10
 	};
@@ -22,24 +22,36 @@ namespace domain {
 		sky,
 		ship
 	};
-	enum class Color {
-		Blace = 0x000000,
-		Red = 0x0000FF,
-		Blue = 0xFF0000,
-		White = 0xFFFFFF
-	};
 	enum class Diff {
 		up = +1,
 		down = -1
 	};
-	struct Point {
+	class Point {
+	private:
 		UINT x;
 		UINT y;
 
-		explicit Point(UINT x_, UINT y_) :
+	public:
+		explicit Point(UINT x_ = 0, UINT y_ = 0) :
 			x{ x_ },
 			y{ y_ }
 		{}
+
+		const UINT X() const { return x; };
+		const UINT Y() const { return y; };
+
+		const Point Up() const {
+			return Point{ x - 1, y };
+		}
+		const Point Down() const {
+			return Point{ x + 1, y };
+		}
+		const Point Left() const {
+			return Point{ x, y - 1 };
+		}
+		const Point Right() const {
+			return Point{ x, y + 1 };
+		}
 	};
 
 	class Data {
@@ -59,6 +71,9 @@ namespace domain {
 		const UINT GetLevelUINT() const {
 			return static_cast<UINT>(level);
 		}
+		const UINT RandUINT(UINT max) {
+			return std::rand() / (RAND_MAX / max);
+		}
 	protected:
 		Data(const HINSTANCE hInstance_ = NULL) :
 			hInstance{ hInstance_ },
@@ -66,6 +81,8 @@ namespace domain {
 			scale{ Scale::scale_2 },
 			level{ Level::level_4 }
 		{};
+
+
 	private:
 		HINSTANCE hInstance;
 
