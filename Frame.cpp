@@ -1,8 +1,6 @@
-
 #include "Frame.h"
 
 using namespace frame;
-
 
 Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
 	static WNDCLASSEXW wcex{
@@ -43,19 +41,19 @@ Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
 	}
 	VariantInstance(std::pair{ hWnd, this });
 }
-Frame& Frame::VariantInstance(
+Frame* Frame::VariantInstance(
 	std::variant<const HWND, std::pair<const HWND, Frame*>> variant) {
 	static std::map<const HWND, Frame*> inst;
 
 	if (variant.index()) {
 		auto [hWnd, ptr] { std::get<std::pair<const HWND, Frame*>>(variant) };
 		inst.emplace(hWnd, ptr);
-		return *ptr;
+		return ptr;
 	}
 	else {
 		auto hWnd{ std::get<const HWND>(variant) };
 		if (auto iter = inst.find(hWnd); iter != inst.end())
-			return *iter->second;
+			return iter->second;
 	}
 }
 const Point Frame::GetPoint(const LPARAM lParam) const {

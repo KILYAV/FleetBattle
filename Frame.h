@@ -24,11 +24,13 @@ namespace frame {
 		);
 		const HWND GetHWND() const { return hWnd; };
 		const Point GetPoint(const LPARAM lParam) const;
+
 		template<class Type>
 		static Type& GetInstance(const HWND hWnd);
+
 	private:
 		HWND hWnd;
-		static Frame& VariantInstance(
+		static Frame* VariantInstance(
 			std::variant<const HWND, std::pair<const HWND, Frame*>> variant
 		);
 	};
@@ -39,7 +41,7 @@ namespace frame {
 
 	class Main :
 		virtual Data,
-		protected Frame
+		public Frame
 	{
 	protected:
 		explicit Main();
@@ -56,9 +58,10 @@ namespace frame {
 		virtual void SetCell(const Point point, const Cell cell) const {};
 		virtual void Fill(const Cell cell) const {};
 	};
+
 	class Draw :
 		virtual Data,
-		protected Frame,
+		public Frame,
 		protected FrameInterface
 	{
 	public:
