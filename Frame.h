@@ -8,7 +8,9 @@
 namespace frame {
 	using namespace domain;
 
-	class Frame : virtual Data {
+	class Frame :
+		virtual Data
+	{
 	protected:
 		enum class IDC {
 			FRAMEMAIN = IDS_APP_TITLE,
@@ -27,14 +29,18 @@ namespace frame {
 	private:
 		HWND hWnd;
 		static Frame& VariantInstance(
-			std::variant<const HWND, std::pair<const HWND, Frame*>> variant);
+			std::variant<const HWND, std::pair<const HWND, Frame*>> variant
+		);
 	};
 	template<class Type>
 	Type& Frame::GetInstance(const HWND hWnd) {
 		return *static_cast<Type*>(VariantInstance(hWnd));
 	}
 
-	class Main : virtual Data, protected Frame {
+	class Main :
+		virtual Data,
+		protected Frame
+	{
 	protected:
 		explicit Main();
 
@@ -44,7 +50,17 @@ namespace frame {
 	private:
 		static LRESULT CALLBACK CallBackMain(HWND, UINT, WPARAM, LPARAM);
 	};
-	class Draw : virtual Data, protected Frame {
+
+	class FrameInterface {
+	public:
+		virtual void SetCell(const Point point, const Cell cell) const {};
+		virtual void Fill(const Cell cell) const {};
+	};
+	class Draw :
+		virtual Data,
+		protected Frame,
+		protected FrameInterface
+	{
 	public:
 		virtual void LButtonDown(const LPARAM lParam) = 0;
 
@@ -52,8 +68,8 @@ namespace frame {
 		explicit Draw(const HWND hWnd, const IDC IDC_FRAME);
 
 		//HDC GetHDC() const { return hDC; };
-		void SetCell(const Point point, const Cell cell) const;
-		void Fill(const Cell cell) const;
+		void SetCell(const Point point, const Cell cell) const override;
+		void Fill(const Cell cell) const override;
 	private:
 		HDC hDC;
 		mutable Cell cell = Cell::sea;

@@ -138,7 +138,13 @@ void Draw::Fill(const Cell cell) const {
 	auto scale{ GetScaleUINT() };
 	for (UINT x = 0; x < size; ++x) {
 		for (UINT y = 0; y < size; ++y) {
-			Rectangle(hDC, x * scale, y * scale, (x + 1) * scale, (y + 1) * scale);
+			Rectangle(
+				hDC,
+				x * scale,
+				y * scale,
+				(x + 1) * scale,
+				(y + 1) * scale
+			);
 		}
 	}
 }
