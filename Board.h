@@ -6,32 +6,63 @@
 namespace board {
 	using namespace domain;
 
-	class BaseBoard : virtual Data {
-	public:
-		void Fill(const Cell cell);
-		void SetCell(const Point point, const Cell cell);
-		const Cell GetCell(const Point point) const;
-		const UINT CountCells(const Cell) const;
-
+	class BaseBoard :
+		virtual Data
+	{
 	protected:
-		explicit BaseBoard(const Cell cell);
+		explicit BaseBoard(
+			const Cell cell
+		);
+
+		void Fill(
+			const Cell cell
+		);
+		void SetCell(
+			const Point point,
+			const Cell cell
+		);
+		const Cell GetCell(
+			const Point point
+		) const;
+		const UINT CountCells(
+			const Cell
+		) const;
+		const Point GepPointCellNumber(
+			const UINT number,
+			const Cell cell
+		) const;
 
 	private:
-		std::vector<Cell> board;
+		using Vector = std::vector<Cell>;
+
+		Vector board;
 	};
 
-	class Sea : virtual Data, protected BaseBoard {
+	class Sea :
+		virtual Data,
+		protected BaseBoard
+	{
 	protected:
-		explicit Sea() : BaseBoard(Cell::sea) {};
+		explicit Sea(Frame&& frame) :
+			BaseBoard(std::move(frame), Cell::sea) {};
 	};
 
-	class Sky : virtual Data, protected BaseBoard {
+	class Sky :
+		virtual Data,
+		protected BaseBoard {
 	protected:
-		explicit Sky() : BaseBoard(Cell::sky) {};
+		explicit Sky(Frame&& frame) :
+			BaseBoard(std::move(frame), Cell::sky) {};
 	};
 
-	class Board : virtual Data, protected Sea, protected Sky {
+	class Board :
+		virtual Data,
+		protected Sea,
+		protected Sky {
 	protected:
-		explicit Board() = default;
+		explicit Board(Frame&& sea, Frame&& sky) :
+			Sea{ std::move(sea) },
+			Sky{ std::move(sky) }
+		{}
 	};
 }
