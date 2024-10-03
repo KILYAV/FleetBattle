@@ -43,16 +43,16 @@ namespace board {
 		protected BaseBoard
 	{
 	protected:
-		explicit Sea(Frame&& frame) :
-			BaseBoard(std::move(frame), Cell::sea) {};
+		explicit Sea() :
+			BaseBoard(Cell::sea) {};
 	};
 
 	class Sky :
 		virtual Data,
 		protected BaseBoard {
 	protected:
-		explicit Sky(Frame&& frame) :
-			BaseBoard(std::move(frame), Cell::sky) {};
+		explicit Sky() :
+			BaseBoard(Cell::sky) {};
 	};
 
 	class Board :
@@ -60,9 +60,6 @@ namespace board {
 		protected Sea,
 		protected Sky {
 	protected:
-		explicit Board(Frame&& sea, Frame&& sky) :
-			Sea{ std::move(sea) },
-			Sky{ std::move(sky) }
-		{}
+		explicit Board() = default
 	};
 }
