@@ -3,8 +3,9 @@
 
 using namespace frame;
 
+
 Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
-	static WNDCLASSEXW wcex {
+	static WNDCLASSEXW wcex{
 		sizeof(WNDCLASSEX),					// cbSize
 		0,									// style
 		NULL,								// lpfnWndProc
@@ -40,21 +41,14 @@ Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
 			| WS_MINIMIZEBOX, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr,
 			nullptr, hInstance, nullptr);
 	}
-	VariantInstance(std::pair{ GetHWND(), this });
-}
-const Point Frame::GetPoint(const LPARAM lParam) const {
-	return Point{ (static_cast<UINT>(lParam) & 0xffff) / GetScaleUINT(),
-		((static_cast<UINT>(lParam) >> 16) & 0xffff) / GetScaleUINT()};
-}
-Frame& Frame::GetInstance(const HWND hWnd) {
-	return VariantInstance(hWnd);
+	VariantInstance(std::pair{ hWnd, this });
 }
 Frame& Frame::VariantInstance(
 	std::variant<const HWND, std::pair<const HWND, Frame*>> variant) {
 	static std::map<const HWND, Frame*> inst;
 
 	if (variant.index()) {
-		auto [hWnd, ptr]{ std::get<std::pair<const HWND, Frame*>>(variant) };
+		auto [hWnd, ptr] { std::get<std::pair<const HWND, Frame*>>(variant) };
 		inst.emplace(hWnd, ptr);
 		return *ptr;
 	}
@@ -64,7 +58,11 @@ Frame& Frame::VariantInstance(
 			return *iter->second;
 	}
 }
-MainFrame::MainFrame() :
+const Point Frame::GetPoint(const LPARAM lParam) const {
+	return Point{ (static_cast<UINT>(lParam) & 0xffff) / GetScaleUINT(),
+		((static_cast<UINT>(lParam) >> 16) & 0xffff) / GetScaleUINT() };
+}
+Main::Main() :
 	Frame{ CallBackMain, NULL, IDC::FRAMEMAIN }
 {
 	RECT RWindows, RClient;
@@ -78,7 +76,7 @@ MainFrame::MainFrame() :
 	ShowWindow(GetHWND(), SW_SHOW);
 	UpdateWindow(GetHWND());
 }
-LRESULT CALLBACK MainFrame::CallBackMain(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Main::CallBackMain(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -88,14 +86,12 @@ LRESULT CALLBACK MainFrame::CallBackMain(HWND hWnd, UINT message, WPARAM wParam,
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
-		case ID_BATTLE_START:
-			GetInstance(hWnd).Battle();
+		case ID_BATTLE_BATTLE:
+			GetInstance<Main>(hWnd).Battle();
 			break;
-			/*
-		case ID_RANDOM:
-			GetInstance(hWnd).CreateFleet();
+		case ID_RANDOM_RANDOM:
+			GetInstance<Main>(hWnd).Start();
 			break;
-			*/
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		};
@@ -105,8 +101,8 @@ LRESULT CALLBACK MainFrame::CallBackMain(HWND hWnd, UINT message, WPARAM wParam,
 	}
 	return 0;
 }
-PlayFrame::PlayFrame(const HWND hWnd, const IDC IDC_FRAME) :
-	Frame{ CallBackPlay, hWnd, IDC_FRAME},
+Draw::Draw(const HWND hWnd, const IDC IDC_FRAME) :
+	Frame{ CallBackDraw, hWnd, IDC_FRAME},
 	hDC{ GetDC(GetHWND()) }
 {
 	UINT sizeFrame{ GetSizeUINT() * GetScaleUINT() };
@@ -119,18 +115,24 @@ PlayFrame::PlayFrame(const HWND hWnd, const IDC IDC_FRAME) :
 
 	SelectCell(Cell::sea);
 }
-void PlayFrame::SetCell(const Point point, const Cell cell) const {
-	if (PlayFrame::cell != cell) {
+void Draw::SetCell(const Point point, const Cell cell) const {
+	if (Draw::cell != cell) {
 		SelectCell(cell);
-		PlayFrame::cell = cell;
+		Draw::cell = cell;
 	}
 	auto scale{ GetScaleUINT() };
-	Rectangle(hDC, point.x * scale, point.y * scale, (point.x + 1) * scale, (point.y + 1) * scale);
+	Rectangle(
+		hDC,
+		point.X() * scale,
+		point.Y() * scale,
+		(point.X() + 1) * scale,
+		(point.Y() + 1) * scale
+	);
 }
-void PlayFrame::Fill(const Cell cell) const {
-	if (PlayFrame::cell != cell) {
+void Draw::Fill(const Cell cell) const {
+	if (Draw::cell != cell) {
 		SelectCell(cell);
-		PlayFrame::cell = cell;
+		Draw::cell = cell;
 	}
 	auto size{ GetSizeUINT() };
 	auto scale{ GetScaleUINT() };
@@ -140,7 +142,13 @@ void PlayFrame::Fill(const Cell cell) const {
 		}
 	}
 }
-void PlayFrame::SelectCell(const Cell cell) const {
+void Draw::SelectCell(const Cell cell) const {
+	enum class Color {
+		Blace = 0x000000,
+		Red   = 0x0000FF,
+		Blue  = 0xFF0000,
+		White = 0xFFFFFF
+	};
 	struct Cell {
 		HBRUSH brush;
 		HPEN pen;
@@ -167,12 +175,12 @@ void PlayFrame::SelectCell(const Cell cell) const {
 		SelectObject(hDC, ship.pen);
 	}
 }
-LRESULT CALLBACK PlayFrame::CallBackPlay(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Draw::CallBackDraw(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case WM_LBUTTONDOWN:
-		GetInstance(hWnd).LButtonDown(lParam);
+		GetInstance<Draw>(hWnd).LButtonDown(lParam);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

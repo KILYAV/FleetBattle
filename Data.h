@@ -81,8 +81,6 @@ namespace domain {
 			scale{ Scale::scale_2 },
 			level{ Level::level_4 }
 		{};
-
-
 	private:
 		HINSTANCE hInstance;
 
