@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <random>
 #include <iostream>
 #include <windows.h>
@@ -32,14 +33,20 @@ namespace domain {
 		UINT y;
 
 	public:
-		explicit Point(UINT x_ = 0, UINT y_ = 0) :
+		explicit Point(
+			UINT x_ = 0,
+			UINT y_ = 0
+		) :
 			x{ x_ },
 			y{ y_ }
 		{}
 
-		const UINT X() const { return x; };
-		const UINT Y() const { return y; };
-
+		const UINT X() const {
+			return x;
+		};
+		const UINT Y() const {
+			return y;
+		};
 		const Point Up() const {
 			return Point{ x - 1, y };
 		}
