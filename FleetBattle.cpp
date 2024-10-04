@@ -48,5 +48,11 @@ void FleetBattle::Battle() {
 	}
 }
 void FleetBattle::Random() {
-	//Allies::Order();
+	Allies::Random();
+	for (UINT x = 0, size = GetSizeUINT(); x < size; ++x) {
+		for (UINT y = 0; y < size; ++y) {
+			Allies::Draw::SetCell(Point{ x, y },
+				Allies::BaseBoard::GetCell(Point{ x, y }));
+		}
+	}
 }

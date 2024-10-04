@@ -5,12 +5,10 @@
 //#include <string>
 
 namespace fleet_battle {
-	using namespace frame;
-
 	class Enemy :
 		virtual domain::Data,
-		Draw,
-		fleet::Fleet
+		protected frame::Draw,
+		protected fleet::Fleet
 	{
 	protected:
 		Enemy(const HWND hWnd);
@@ -19,7 +17,7 @@ namespace fleet_battle {
 
 	class Allies :
 		virtual domain::Data,
-		Draw,
+		protected frame::Draw,
 		protected fleet::Fleet
 	{
 	protected:
@@ -29,7 +27,7 @@ namespace fleet_battle {
 
 	class FleetBattle :
 		virtual domain::Data,
-		Main,
+		frame::Main,
 		Enemy,
 		Allies
 	{

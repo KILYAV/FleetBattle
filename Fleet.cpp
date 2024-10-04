@@ -46,17 +46,22 @@ std::optional<Cell> Fleet::Manual(const Point point) {
 	}
 	return {};
 }
-void Fleet::Order() {
+void Fleet::Random() {
 	Fill(Cell::sea);
+	BuildShip();
+
 }
 void Fleet::BuildShip() {
-	UINT count = GetCountCells(Cell::sea);
-	UINT rand = RandUINT(count);
-	Point point{ GepPointCellNumber(rand, Cell::sea) };
-	CheckDiagonally(point);
+	Point point;
+	do {
+		UINT count = GetCountCells(Cell::sea);
+		UINT rand = RandUINT(count);
+		point = GepPoint(rand, Cell::sea);
+	} while (false == (CheckCorner(point) && CheckCross(point)));
+	SetCell(point, Cell::ship);
 }
 std::optional<Fleet::variant> Fleet::CheckLevel(const Point point) const {
-	if (false == CheckDiagonally(point)) {
+	if (false == CheckCorner(point)) {
 		return {};
 	}
 	auto index{ CheckLines(point) };
@@ -85,7 +90,7 @@ bool Fleet::CheckCross(const Point point) const {
 			return false;
 	return true;
 }
-bool Fleet::CheckDiagonally(const Point point) const {
+bool Fleet::CheckCorner(const Point point) const {
 	auto max{ GetMax() };
 	if (point.Y() && point.X())
 		if (Cell::ship == GetCell(point.Up().Left()))

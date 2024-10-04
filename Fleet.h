@@ -12,13 +12,13 @@ namespace fleet {
 
 		std::optional<std::pair<UINT, Diff>> Status() const;
 		std::optional<Cell> Manual(const Point point);
-		void Order();
+		void Random();
 	private:
 		using variant = std::pair<std::pair<UINT, UINT>, Diff>;
 		std::optional<variant> CheckLevel(const Point point) const;
 
 		bool CheckCross(const Point point) const;
-		bool CheckDiagonally(const Point point) const;
+		bool CheckCorner(const Point point) const;
 		std::pair<UINT, UINT> CheckLines(const Point point) const;
 
 		UINT CheckUp(const Point point) const;

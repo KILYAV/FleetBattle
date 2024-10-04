@@ -28,19 +28,19 @@ const UINT BaseBoard::GetCountCells(const Cell cell) const {
 	return count;
 }
 
-const Point BaseBoard::GepPointCellNumber(
+const Point BaseBoard::GepPoint(
 	const UINT number, const Cell cell) const
 {
 	UINT count{ 0 };
 	for (UINT ind = 0, size = board.size(); ind < size; ++ind) {
 		if (cell == board[ind]) {
-			++count;
 			if (number == count) {
 				return Point{
-					ind - ind / GetSizeUINT(),
+					ind - ind / GetSizeUINT() * GetSizeUINT(),
 					ind / GetSizeUINT()
 				};
 			}
+			++count;
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace board {
 		const UINT GetCountCells(
 			const Cell
 		) const;
-		const Point GepPointCellNumber(
+		const Point GepPoint(
 			const UINT number,
 			const Cell cell
 		) const;
