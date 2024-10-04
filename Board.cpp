@@ -19,7 +19,7 @@ void BaseBoard::SetCell(const Point point, const Cell cell) {
 const Cell BaseBoard::GetCell(const Point point) const {
 	return board[point.Y() * GetSizeUINT() + point.X()];
 }
-const UINT BaseBoard::CountCells(const Cell cell) const {
+const UINT BaseBoard::GetCountCells(const Cell cell) const {
 	UINT count{ 0 };
 	for (auto& cell_ : board) {
 		if (cell_ == cell)
@@ -28,7 +28,7 @@ const UINT BaseBoard::CountCells(const Cell cell) const {
 	return count;
 }
 
-const Point board::BaseBoard::GepPointCellNumber(
+const Point BaseBoard::GepPointCellNumber(
 	const UINT number, const Cell cell) const
 {
 	UINT count{ 0 };

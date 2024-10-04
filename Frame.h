@@ -46,7 +46,7 @@ namespace frame {
 	protected:
 		explicit Main();
 
-		virtual void Start() = 0;
+		virtual void Random() = 0;
 		virtual void Battle() = 0;
 
 	private:

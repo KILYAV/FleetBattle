@@ -39,7 +39,7 @@ Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
 			| WS_MINIMIZEBOX, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr,
 			nullptr, hInstance, nullptr);
 	}
-	VariantInstance(std::pair{ hWnd, this });
+	VariantInstance(std::pair{ GetHWND(), this});
 }
 Frame* Frame::VariantInstance(
 	std::variant<const HWND, std::pair<const HWND, Frame*>> variant) {
@@ -88,7 +88,7 @@ LRESULT CALLBACK Main::CallBackMain(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			GetInstance<Main>(hWnd).Battle();
 			break;
 		case ID_RANDOM_RANDOM:
-			GetInstance<Main>(hWnd).Start();
+			GetInstance<Main>(hWnd).Random();
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);

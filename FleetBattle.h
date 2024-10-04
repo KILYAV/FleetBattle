@@ -8,24 +8,25 @@ namespace fleet_battle {
 	using namespace frame;
 
 	class Enemy : virtual domain::Data, virtual board::Board,
-		PlayFrame, fleet::Fleet {
+		Draw, fleet::Fleet {
 	protected:
 		Enemy(const HWND hWnd);
 		void LButtonDown(const LPARAM lParam) override;
 	};
 
 	class Allies : virtual domain::Data, virtual board::Board,
-		PlayFrame, protected fleet::Fleet {
+		Draw, protected fleet::Fleet {
 	protected:
 		Allies(const HWND hWnd);
 		void LButtonDown(const LPARAM lParam) override;
 	};
 
 	class FleetBattle : virtual domain::Data, virtual board::Board,
-		MainFrame, Enemy, Allies {
+		Main, Enemy, Allies {
 	public:
 		FleetBattle(const HINSTANCE hInstance);
 	private:
-		void Battle() const override;
+		void Battle() override;
+		void Random() override;
 	};
 }
