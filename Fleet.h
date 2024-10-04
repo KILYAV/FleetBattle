@@ -17,6 +17,7 @@ namespace fleet {
 		using variant = std::pair<std::pair<UINT, UINT>, Diff>;
 		std::optional<variant> CheckLevel(const Point point) const;
 
+		bool CheckCross(const Point point) const;
 		bool CheckDiagonally(const Point point) const;
 		std::pair<UINT, UINT> CheckLines(const Point point) const;
 
@@ -29,21 +30,6 @@ namespace fleet {
 
 		void BuildShip();
 
-		class Rank :
-			std::vector<UINT>
-		{
-		private:
-			using vector = std::vector<UINT>;
-		public:
-			using vector::at;
-			using vector::size;
-
-			Rank(UINT size) :
-				vector{ size }
-			{};
-			void ReStart();
-		};
-
-		Rank ranks;
+		std::vector<UINT> ranks;
 	};
 }

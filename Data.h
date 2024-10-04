@@ -48,16 +48,16 @@ namespace domain {
 			return y;
 		};
 		const Point Up() const {
-			return Point{ x - 1, y };
-		}
-		const Point Down() const {
-			return Point{ x + 1, y };
-		}
-		const Point Left() const {
 			return Point{ x, y - 1 };
 		}
-		const Point Right() const {
+		const Point Down() const {
 			return Point{ x, y + 1 };
+		}
+		const Point Left() const {
+			return Point{ x - 1, y };
+		}
+		const Point Right() const {
+			return Point{ x + 1, y };
 		}
 	};
 

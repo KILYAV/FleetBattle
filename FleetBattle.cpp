@@ -2,6 +2,7 @@
 
 #include <string>
 
+using namespace domain;
 using namespace fleet_battle;
 
 Enemy::Enemy(const HWND hWnd) :
@@ -18,16 +19,13 @@ Allies::Allies(const HWND hWnd) :
 	Draw::Fill(Cell::sea);
 };
 void Allies::LButtonDown(const LPARAM lParam) {
-	using namespace domain;
 	auto point{ GetPoint(lParam) };
 	if (auto check{ Fleet::Manual(point) }; check) {
 		if (Cell::ship == check.value()) {
 			Draw::SetCell(point, Cell::ship);
-			Board::Sea::SetCell(point, Cell::ship);
 		}
 		else {
 			Draw::SetCell(point, Cell::sea);
-			Board::Sea::SetCell(point, Cell::sea);
 		}
 	}
 }
