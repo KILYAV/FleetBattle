@@ -2,6 +2,7 @@
 #include <memory>
 #include <random>
 #include <iostream>
+#include <time.h>
 #include <windows.h>
 
 namespace domain {
@@ -27,6 +28,9 @@ namespace domain {
 		up = +1,
 		down = -1
 	};
+
+	UINT GetRandUINT(const UINT max);
+
 	class Point {
 	private:
 		UINT x;
@@ -34,30 +38,38 @@ namespace domain {
 
 	public:
 		explicit Point(
-			UINT x_ = 0,
-			UINT y_ = 0
+			UINT new_x = -1,
+			UINT new_y = -1
 		) :
-			x{ x_ },
-			y{ y_ }
+			x{ new_x },
+			y{ new_y }
 		{}
 
-		const UINT X() const {
-			return x;
+		UINT X() const;
+		UINT Y() const;
+
+		bool IsNan(const UINT max = -1) const;
+
+		Point Up() const;
+		Point Down() const;
+		Point Left() const;
+		Point Right() const;
+
+		enum class Direct {
+			up,
+			down,
+			left,
+			right,
+			center
 		};
-		const UINT Y() const {
-			return y;
-		};
-		const Point Up() const {
-			return Point{ x, y - 1 };
-		}
-		const Point Down() const {
-			return Point{ x, y + 1 };
-		}
-		const Point Left() const {
-			return Point{ x - 1, y };
-		}
-		const Point Right() const {
-			return Point{ x + 1, y };
+		static Direct RotateDirect(const Direct direct);
+		static Direct GetRandDirect();
+		Point MoveDirect(const Direct direct) const;
+
+		bool operator== (const Point point) const {
+			if (this->IsNan() || point.IsNan())
+				return false;
+			return x == point.x && y == point.y;
 		}
 	};
 
@@ -65,21 +77,18 @@ namespace domain {
 	public:
 		const HINSTANCE GetHInstance() const { return hInstance; };
 
-		const Size GetSize() const { return size; };
-		const Scale GetScale() const { return scale; };
-		const Level GetLevel() const { return level; };
+		Size GetSize() const { return size; };
+		Scale GetScale() const { return scale; };
+		Level GetLevel() const { return level; };
 
-		const UINT GetSizeUINT() const {
+		UINT GetSizeUINT() const {
 			return static_cast<UINT>(size);
 		}
-		const UINT GetScaleUINT() const {
+		UINT GetScaleUINT() const {
 			return static_cast<UINT>(scale);
 		}
-		const UINT GetLevelUINT() const {
+		UINT GetLevelUINT() const {
 			return static_cast<UINT>(level);
-		}
-		const UINT RandUINT(UINT max) {
-			return std::rand() / (RAND_MAX / max);
 		}
 	protected:
 		Data(const HINSTANCE hInstance_ = NULL) :
@@ -87,7 +96,9 @@ namespace domain {
 			size{ Size::size_10 },
 			scale{ Scale::scale_2 },
 			level{ Level::level_4 }
-		{};
+		{
+			std::srand(std::time(NULL));
+		};
 	private:
 		HINSTANCE hInstance;
 

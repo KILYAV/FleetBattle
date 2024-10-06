@@ -21,14 +21,10 @@ namespace board {
 			const Point point,
 			const Cell cell
 		);
-		const Cell GetCell(
+		Cell GetCell(
 			const Point point
 		) const;
-		const UINT GetCountCells(
-			const Cell
-		) const;
-		const Point GepPoint(
-			const UINT number,
+		Point GetRandPoint(
 			const Cell cell
 		) const;
 

@@ -48,17 +48,37 @@ std::optional<Cell> Fleet::Manual(const Point point) {
 }
 void Fleet::Random() {
 	Fill(Cell::sea);
-	BuildShip();
+	for (UINT index = 0, size = GetLevelUINT(), count = size;
+		index < size; ++index) {
+		ranks[index] = count--;
+	}
 
+	UINT count{ 4 };
+	for (UINT index = 0; index < count; ++index) {
+		CreateShip(Level::level_1);
+	}
 }
-void Fleet::BuildShip() {
-	Point point;
+void Fleet::CreateShip(const Level level) {
+	Point front;
 	do {
-		UINT count = GetCountCells(Cell::sea);
-		UINT rand = RandUINT(count);
-		point = GepPoint(rand, Cell::sea);
-	} while (false == (CheckCorner(point) && CheckCross(point)));
-	SetCell(point, Cell::ship);
+		front = GetRandPoint(Cell::sea);
+	} while (false == CheckCorner(front));
+
+	if (Level::level_1 == level) {
+		SetCell(front, Cell::ship);
+		return;
+	}
+
+	LevelUp(front);
+}
+Point Fleet::LevelUp(const Point point) {
+	UINT max{ GetMax() };
+
+	Point::Direct direct = Point::GetRandDirect();
+	while (false == point.MoveDirect(direct).IsNan(max)) {
+		direct = Point::RotateDirect(direct);
+	}
+
 }
 std::optional<Fleet::variant> Fleet::CheckLevel(const Point point) const {
 	if (false == CheckCorner(point)) {
@@ -74,7 +94,7 @@ std::optional<Fleet::variant> Fleet::CheckLevel(const Point point) const {
 	else
 		return {};
 }
-bool Fleet::CheckCross(const Point point) const {
+bool Fleet::CheckSquare(const Point point) const {
 	auto max{ GetMax() };
 	if (point.X())
 		if (Cell::ship == GetCell(point.Left()))
@@ -88,7 +108,7 @@ bool Fleet::CheckCross(const Point point) const {
 	if (point.Y() < max)
 		if (Cell::ship == GetCell(point.Down()))
 			return false;
-	return true;
+	return CheckCorner(point);
 }
 bool Fleet::CheckCorner(const Point point) const {
 	auto max{ GetMax() };

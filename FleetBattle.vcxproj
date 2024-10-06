@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="Fleet.cpp" />
     <ClCompile Include="FleetBattle.cpp" />
     <ClCompile Include="Frame.cpp" />

@@ -17,7 +17,7 @@ namespace fleet {
 		using variant = std::pair<std::pair<UINT, UINT>, Diff>;
 		std::optional<variant> CheckLevel(const Point point) const;
 
-		bool CheckCross(const Point point) const;
+		bool CheckSquare(const Point point) const;
 		bool CheckCorner(const Point point) const;
 		std::pair<UINT, UINT> CheckLines(const Point point) const;
 
@@ -28,7 +28,8 @@ namespace fleet {
 
 		UINT GetMax() const { return GetSizeUINT() - 1; };
 
-		void BuildShip();
+		void CreateShip(const Level level);
+		Point LevelUp(const Point point);
 
 		std::vector<UINT> ranks;
 	};

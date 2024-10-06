@@ -75,7 +75,7 @@ namespace frame {
 		void Fill(const Cell cell) const override;
 	private:
 		HDC hDC;
-		mutable Cell cell = Cell::sea;
+		mutable Cell type = Cell::sea;
 
 		void SelectCell(const Cell cell) const;
 

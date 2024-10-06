@@ -114,9 +114,9 @@ Draw::Draw(const HWND hWnd, const IDC IDC_FRAME) :
 	SelectCell(Cell::sea);
 }
 void Draw::SetCell(const Point point, const Cell cell) const {
-	if (Draw::cell != cell) {
+	if (Draw::type != cell) {
 		SelectCell(cell);
-		Draw::cell = cell;
+		Draw::type = cell;
 	}
 	auto scale{ GetScaleUINT() };
 	Rectangle(
@@ -128,9 +128,9 @@ void Draw::SetCell(const Point point, const Cell cell) const {
 	);
 }
 void Draw::Fill(const Cell cell) const {
-	if (Draw::cell != cell) {
+	if (Draw::type != cell) {
 		SelectCell(cell);
-		Draw::cell = cell;
+		Draw::type = cell;
 	}
 	auto size{ GetSizeUINT() };
 	auto scale{ GetScaleUINT() };
