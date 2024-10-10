@@ -3,23 +3,23 @@
 using namespace domain;
 using namespace board;
 
-BaseBoard::BaseBoard(
+Board::Board(
 	const Cell cell
 ) :
 	board{ Vector{ GetSizeUINT() * GetSizeUINT(), cell }}
 {}
-void BaseBoard::Fill(const Cell cell) {
+void Board::Fill(const Cell cell) {
 	for (auto& cell_ : board) {
 		cell_ = cell;
 	}
 }
-void BaseBoard::SetCell(const Point point, const Cell cell) {
+void Board::SetCell(const Point point, const Cell cell) {
 	board[point.Y() * GetSizeUINT() + point.X()] = cell;
 }
-Cell BaseBoard::GetCell(const Point point) const {
+Cell Board::GetCell(const Point point) const {
 	return board[point.Y() * GetSizeUINT() + point.X()];
 }
-Point BaseBoard::GetRandPoint(const Cell type) const {
+Point Board::GetRandPoint(const Cell type) const {
 	UINT count{ 0 };
 	for (const auto& cell : board) {
 		if (cell == type)
@@ -33,7 +33,7 @@ Point BaseBoard::GetRandPoint(const Cell type) const {
 		if (type == board[ind]) {
 			if (rand == number) {
 				return Point{
-					ind - ind / GetSizeUINT() * GetSizeUINT(),
+					ind % GetSizeUINT(),
 					ind / GetSizeUINT()
 				};
 			}

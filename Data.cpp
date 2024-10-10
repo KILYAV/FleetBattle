@@ -1,9 +1,6 @@
 #include "Data.h"
 
 using namespace domain;
-UINT GetRandUINT(const UINT max) {
-	return std::rand() / (RAND_MAX / max);
-}
 
 UINT Point::X() const {
 	return x;
@@ -11,12 +8,11 @@ UINT Point::X() const {
 UINT Point::Y() const {
 	return y;
 };
-bool Point::IsNan(const UINT max = -1) const {
-	if (-1 == x || -1 == y)
-		return true;
-	if (x >= max || y >= max)
-		return true;
-	return false;
+bool Point::IsNan() const {
+	return -1 == x || -1 == y;
+}
+bool Point::IsNan(const UINT max) const {
+	return x > max || y > max;
 }
 Point Point::Up() const {
 	if (this->IsNan() || (y - 1 == -1))
@@ -37,34 +33,37 @@ Point Point::Left() const {
 		return Point{ x - 1, y };
 }
 Point Point::Right() const {
-	if (this->IsNan() || (x - 1 == -1))
+	if (this->IsNan() || (x + 1 == -1))
 		return Point{};
 	else
 		return Point{ x + 1, y };
 }
-
-Point::Direct Point::RotateDirect(const Direct direct) {
-	if (Direct::up == direct)
-		return Direct::right;
-	if (Direct::right == direct)
-		return Direct::down;
-	if (Direct::down == direct)
-		return Direct::left;
-	if (Direct::left == direct)
-		return Direct::up;
+HINSTANCE Data::GetHInstance() const {
+	return hInstance;
+};
+Size Data::GetSize() const {
+	return size;
+};
+Scale Data::GetScale() const {
+	return scale;
+};
+Level Data::GetLevel() const {
+	return level;
+};
+UINT Data::GetSizeUINT() const {
+	return static_cast<UINT>(size);
 }
-Point::Direct Point::GetRandDirect() {
-	return static_cast<Direct>(
-		GetRandUINT(static_cast<UINT>(Direct::center)));
+UINT Data::GetScaleUINT() const {
+	return static_cast<UINT>(scale);
 }
-
-Point Point::MoveDirect(const Direct direct) const {
-	if (Direct::up == direct)
-		return this->Up();
-	if (Direct::down == direct)
-		return this->Down();
-	if (Direct::left == direct)
-		return this->Left();
-	if (Direct::right == direct)
-		return this->Right();
+UINT Data::GetLevelUINT() const {
+	return static_cast<UINT>(level);
 }
+Data::Data(const HINSTANCE hInstance_) :
+	hInstance{ hInstance_ },
+	size{ Size::size_10 },
+	scale{ Scale::scale_2 },
+	level{ Level::level_4 }
+{
+	std::srand(std::time(NULL));
+};

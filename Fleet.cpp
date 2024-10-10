@@ -4,38 +4,40 @@
 using namespace fleet;
 
 Fleet::Fleet() :
-	BaseBoard{ Cell::sea }
+	Board{ Cell::sea }
 {
-	ranks.resize(GetSizeUINT());
+	ranks.resize(GetLevelUINT());
 }
-std::optional<std::pair<UINT, Diff>> Fleet::Status() const {
+std::optional<std::pair<UINT, bool>> Fleet::Status() const {
 	auto max{ GetLevelUINT() };
 	for (UINT index = 0, size = ranks.size(); index < size; ++index) {
 		if (ranks[index] == max) {
 			--max;
 		}
 		else {
-			return { { max, ranks[index] > max ? Diff::up : Diff::down}};
+			return { { max, ranks[index] > max } };
 		}
 	}
 	return {};
 }
-std::optional<Cell> Fleet::Manual(const Point point) {
-	auto check{ Fleet::CheckLevel(point) };
+std::optional<Cell> Fleet::Manual(
+	const Point point
+) {
+	auto check{ Fleet::LevelUp(point) };
 	if (check) {
-		auto& [index, diff] { check.value() };
-		if (Diff::up == diff) {
-			if (index.first + index.second >= GetLevelUINT())
+		auto& [first, second, levelUp] { check.value() };
+		if (levelUp) {
+			if (first + second >= GetLevelUINT())
 				return {};
 		}
-		if (index.first) {
-			ranks[index.first - 1] -= static_cast<int>(diff);
+		if (first) {
+			ranks[first - 1]  += levelUp ? -1 : +1;
 		}
-		if (index.second) {
-			ranks[index.second - 1] -= static_cast<int>(diff);
+		if (second) {
+			ranks[second - 1] += levelUp ? -1 : +1;
 		}
-		ranks[index.first + index.second] += static_cast<int>(diff);
-		if (Diff::up == diff) {
+		ranks[first + second] += levelUp ? +1 : -1;
+		if (levelUp) {
 			SetCell(point, Cell::ship);
 			return { Cell::ship };
 		}
@@ -46,6 +48,20 @@ std::optional<Cell> Fleet::Manual(const Point point) {
 	}
 	return {};
 }
+std::optional<std::wstring> Fleet::Cancel() const {
+	if (auto check = Status(); check.has_value()) {
+		auto [level, diff] {check.value()};
+		std::wstring messing{ L"Too " };
+		if (diff)
+			messing += L"many ";
+		else
+			messing += L"few ";
+		return
+			messing + std::to_wstring(level) + L"-level ships";
+	}
+	else
+		return {};
+}
 void Fleet::Random() {
 	Fill(Cell::sea);
 	for (UINT index = 0, size = GetLevelUINT(), count = size;
@@ -53,112 +69,192 @@ void Fleet::Random() {
 		ranks[index] = count--;
 	}
 
-	UINT count{ 4 };
-	for (UINT index = 0; index < count; ++index) {
-		CreateShip(Level::level_1);
+	for (UINT level = ranks.size(); level > 0; --level) {
+		for (UINT number = 0, count = ranks[level - 1]; number < count; ++number) {
+			GetShip(static_cast<Level>(level));
+		}
 	}
 }
-void Fleet::CreateShip(const Level level) {
-	Point front;
-	do {
-		front = GetRandPoint(Cell::sea);
-	} while (false == CheckCorner(front));
-
-	if (Level::level_1 == level) {
-		SetCell(front, Cell::ship);
-		return;
+bool Fleet::CompareCell(
+	const Point point,
+	const Cell cell
+) const {
+	if (false == point.IsNan(GetMax())) {
+		if (cell == GetCell(point)) {
+			return true;
+		}
 	}
-
-	LevelUp(front);
+	return false;
 }
-Point Fleet::LevelUp(const Point point) {
-	UINT max{ GetMax() };
-
-	Point::Direct direct = Point::GetRandDirect();
-	while (false == point.MoveDirect(direct).IsNan(max)) {
-		direct = Point::RotateDirect(direct);
+bool Fleet::CompareShip(
+	const Point point
+) const {
+	return
+		CompareCell(point, Cell::ship);
+}
+bool Fleet::CompareSea(
+	const Point point
+) const {
+	if (CheckSquare(point))
+		return false;
+	else {
+		return CompareCell(point, Cell::sea);
 	}
-
 }
-std::optional<Fleet::variant> Fleet::CheckLevel(const Point point) const {
-	if (false == CheckCorner(point)) {
+bool Fleet::CheckCorner(
+	const Point point
+) const {
+	const bool comp[]{
+		CompareShip(point.Up().Left()),
+		CompareShip(point.Up().Right()),
+		CompareShip(point.Down().Left()),
+		CompareShip(point.Down().Right())
+	};
+	bool result = comp[0];
+	for (UINT index = 1, size = std::size(comp); index < size; ++index) {
+		result |= comp[index];
+	}
+	return result;
+}
+bool Fleet::CheckSquare(
+	const Point point
+) const {
+	const bool comp[]{
+		CompareShip(point.Up()),
+		CompareShip(point.Down()),
+		CompareShip(point.Left()),
+		CompareShip(point.Right()),
+	};
+	bool result = CheckCorner(point);
+	for (UINT index = 0, size = std::size(comp); index < size; ++index) {
+		result |= comp[index];
+	}
+	return result;
+}
+UINT Fleet::CheckRaw(
+	Compare compare,
+	const Point prev,
+	Direct direct
+) const {
+	Point next = (&prev->*direct)();
+	if (false == next.IsNan(GetMax()))
+		if ((this->*compare)(next))
+			return CheckRaw(compare, next, direct) + 1;
+	return 0;
+}
+std::optional<std::tuple<UINT, UINT, bool>> Fleet::LevelUp(
+	const Point point
+) const {
+	if (CheckCorner(point)) {
 		return {};
 	}
-	auto index{ CheckLines(point) };
+	UINT first{
+		CheckRaw(&Fleet::CompareShip, point, &Point::Up) +
+		CheckRaw(&Fleet::CompareShip, point, &Point::Left)
+	};
+	UINT second{
+		CheckRaw(&Fleet::CompareShip, point, &Point::Down) +
+		CheckRaw(&Fleet::CompareShip, point, &Point::Right)
+	};
 	if (Cell::sea == GetCell(point)) {
-		return { std::pair{ index, Diff::up } };
+		return { { first, second, true } };
 	}
 	else if (Cell::ship == GetCell(point)) {
-		return { std::pair{ index, Diff::down } };
+		return { { first, second, false } };
 	}
 	else
 		return {};
 }
-bool Fleet::CheckSquare(const Point point) const {
-	auto max{ GetMax() };
-	if (point.X())
-		if (Cell::ship == GetCell(point.Left()))
-			return false;
-	if (point.X() < max)
-		if (Cell::ship == GetCell(point.Right()))
-			return false;
-	if (point.Y())
-		if (Cell::ship == GetCell(point.Up()))
-			return false;
-	if (point.Y() < max)
-		if (Cell::ship == GetCell(point.Down()))
-			return false;
-	return CheckCorner(point);
+enum Direct {
+	up,
+	left,
+	ver,
+	hor
+};
+Point Fleet::GetCenter() const {
+	Point point;
+	do {
+		point = GetRandPoint(Cell::sea);
+	} while (CheckSquare(point));
+	return point;
 }
-bool Fleet::CheckCorner(const Point point) const {
-	auto max{ GetMax() };
-	if (point.Y() && point.X())
-		if (Cell::ship == GetCell(point.Up().Left()))
-			return false;
-	if (point.Y() && (point.X() < max))
-		if (Cell::ship == GetCell(point.Up().Right()))
-			return false;
-	if ((point.Y() < max) && point.X())
-		if (Cell::ship == GetCell(point.Down().Left()))
-			return false;
-	if ((point.Y() < max) && (point.X() < max))
-		if (Cell::ship == GetCell(point.Down().Right()))
-			return false;
-	return true;
+std::tuple<UINT, UINT, UINT, UINT> Fleet::GetRaw(
+	const Point point
+) const {
+	UINT up   = CheckRaw(&Fleet::CompareSea, point, &Point::Up);
+	UINT left = CheckRaw(&Fleet::CompareSea, point, &Point::Left);
+	UINT ver  = CheckRaw(&Fleet::CompareSea, point, &Point::Down);
+	UINT hor  = CheckRaw(&Fleet::CompareSea, point, &Point::Right);
+
+	ver  = ver + up + 1;
+	hor  = hor + left + 1;
+	up   = point.Y() - up;
+	left = point.X() - left;
+
+	return { up, left, ver, hor };
 }
-std::pair<UINT, UINT> Fleet::CheckLines(const Point point) const {
-	return { CheckUp(point) + CheckLeft(point),
-		CheckDown(point) + CheckRight(point) };
+std::tuple<Point, UINT, UINT, UINT, UINT> Fleet::GetPointRaw(
+	const Level level
+) const {
+	Point center;
+	std::tuple<UINT, UINT, UINT, UINT> tuple;
+	do {
+		center = GetCenter();
+		tuple = GetRaw(center);
+	} while (
+		(static_cast<UINT>(level) > std::get<ver>(tuple)) &&
+		(static_cast<UINT>(level) > std::get<hor>(tuple))
+		);
+	return {
+		center,
+		std::get<up>(tuple),
+		std::get<left>(tuple),
+		std::get<ver>(tuple),
+		std::get<hor>(tuple)
+	};
 }
-UINT Fleet::CheckUp(const Point point) const {
-	if (point.Y()) {
-		if (Cell::ship == GetCell(point.Up())) {
-			return CheckUp(point.Up()) + 1;
+UINT Fleet::GetOffset(const UINT line, const Level level) const {
+	UINT delta = line - static_cast<UINT>(level);
+	delta = GetRandUINT(delta + 1);
+	return delta;
+}
+std::pair<Point, Fleet::Direct> Fleet::GetPointDirect(
+	const Level level
+) const {
+	auto [center, up, left, ver, hor] {GetPointRaw(level)};
+
+	UINT deltaX = center.X();
+	UINT deltaY = center.Y();
+	Direct direct = nullptr;
+	if (hor < static_cast<UINT>(level)) {
+		deltaY = up + GetOffset(ver, level);
+		direct = &Point::Down;
+	}
+	else if (ver < static_cast<UINT>(level)) {
+		deltaX = left + GetOffset(hor, level);
+		direct = &Point::Right;
+	}
+	else {
+		if (GetRandBool()) {
+			deltaY = up + GetOffset(ver, level);
+			direct = &Point::Down;
+		}
+		else {
+			deltaX = left + GetOffset(hor, level);
+			direct = &Point::Right;
 		}
 	}
-	return 0;
+
+	return {
+		Point{ deltaX, deltaY },
+		direct
+	};
 }
-UINT Fleet::CheckDown(const Point point) const {
-	if (point.Y() < GetMax()) {
-		if (Cell::ship == GetCell(point.Down())) {
-			return CheckDown(point.Down()) + 1;
-		}
+void Fleet::GetShip(const Level level) {
+	auto [point, direct] = GetPointDirect(level);
+	for (UINT index = 0, size = static_cast<UINT>(level);
+		index < size; ++index) {
+		SetCell(point, Cell::ship);
+		point = (&point->*direct)();
 	}
-	return 0;
-}
-UINT Fleet::CheckLeft(const Point point) const {
-	if (point.X()) {
-		if (Cell::ship == GetCell(point.Left())) {
-			return CheckLeft(point.Left()) + 1;
-		}
-	}
-	return 0;
-}
-UINT Fleet::CheckRight(const Point point) const {
-	if (point.X() < GetMax()) {
-		if (Cell::ship == GetCell(point.Right())) {
-			return CheckRight(point.Right()) + 1;
-		}
-	}
-	return 0;
 }

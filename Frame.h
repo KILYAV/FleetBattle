@@ -56,6 +56,7 @@ namespace frame {
 	class FrameInterface {
 	public:
 		virtual void SetCell(const Point point, const Cell cell) const {};
+		virtual void Fill(const std::vector<Cell>& vector) const {};
 		virtual void Fill(const Cell cell) const {};
 	};
 
@@ -70,8 +71,8 @@ namespace frame {
 	protected:
 		explicit Draw(const HWND hWnd, const IDC IDC_FRAME);
 
-		//HDC GetHDC() const { return hDC; };
 		void SetCell(const Point point, const Cell cell) const override;
+		void Fill(const std::vector<Cell>& vector) const override;
 		void Fill(const Cell cell) const override;
 	private:
 		HDC hDC;
