@@ -2,7 +2,11 @@
 
 using namespace frame;
 
-Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
+Frame::Frame(
+	const WNDPROC WndProc,
+	const HWND hWnd,
+	const IDC IDC_FRAME
+) {
 	static WNDCLASSEXW wcex{
 		sizeof(WNDCLASSEX),					// cbSize
 		0,									// style
@@ -42,7 +46,9 @@ Frame::Frame(const WNDPROC WndProc, const HWND hWnd, const IDC IDC_FRAME) {
 	VariantInstance(std::pair{ GetHWND(), this});
 }
 Frame* Frame::VariantInstance(
-	std::variant<const HWND, std::pair<const HWND, Frame*>> variant) {
+	std::variant<const HWND,
+	std::pair<const HWND, Frame*>> variant
+) {
 	static std::map<const HWND, Frame*> inst;
 
 	if (variant.index()) {
@@ -56,7 +62,9 @@ Frame* Frame::VariantInstance(
 			return iter->second;
 	}
 }
-const Point Frame::GetPoint(const LPARAM lParam) const {
+const Point Frame::GetPoint(
+	const LPARAM lParam
+) const {
 	return Point{ (static_cast<UINT>(lParam) & 0xffff) / GetScaleUINT(),
 		((static_cast<UINT>(lParam) >> 16) & 0xffff) / GetScaleUINT() };
 }
@@ -74,8 +82,12 @@ Main::Main() :
 	ShowWindow(GetHWND(), SW_SHOW);
 	UpdateWindow(GetHWND());
 }
-LRESULT CALLBACK Main::CallBackMain(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK Main::CallBackMain(
+	HWND hWnd,
+	UINT message,
+	WPARAM wParam,
+	LPARAM lParam
+) {
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -99,7 +111,10 @@ LRESULT CALLBACK Main::CallBackMain(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	}
 	return 0;
 }
-Draw::Draw(const HWND hWnd, const IDC IDC_FRAME) :
+Draw::Draw(
+	const HWND hWnd,
+	const IDC IDC_FRAME
+) :
 	Frame{ CallBackDraw, hWnd, IDC_FRAME},
 	hDC{ GetDC(GetHWND()) }
 {
@@ -113,7 +128,8 @@ Draw::Draw(const HWND hWnd, const IDC IDC_FRAME) :
 
 	SelectCell(Cell::sea);
 }
-void Draw::SetCell(const Point point, const Cell cell) const {
+void Draw::SetCell(
+	const Point point, const Cell cell) const {
 	if (Draw::type != cell) {
 		SelectCell(cell);
 		Draw::type = cell;
@@ -126,6 +142,18 @@ void Draw::SetCell(const Point point, const Cell cell) const {
 		(point.X() + 1) * scale,
 		(point.Y() + 1) * scale
 	);
+}
+void Draw::Fill(
+	const std::vector<Cell>& vector
+) const {
+	UINT size{ GetSizeUINT() };
+	for (UINT index = 0, max = vector.size();
+		index < max; ++index) {
+		SetCell(
+			Point{ index % size, index / size },
+			vector[index]
+		);
+	}
 }
 void Draw::Fill(const Cell cell) const {
 	if (Draw::type != cell) {

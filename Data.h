@@ -24,12 +24,13 @@ namespace domain {
 		sky,
 		ship
 	};
-	enum class Diff {
-		up = +1,
-		down = -1
-	};
 
-	UINT GetRandUINT(const UINT max);
+	static UINT GetRandUINT(const UINT max) {
+		return std::rand() / (RAND_MAX / max);
+	}
+	static UINT GetRandBool() {
+		return GetRandUINT(2);
+	}
 
 	class Point {
 	private:
@@ -48,57 +49,28 @@ namespace domain {
 		UINT X() const;
 		UINT Y() const;
 
-		bool IsNan(const UINT max = -1) const;
+		bool IsNan() const;
+		bool IsNan(const UINT max) const;
 
 		Point Up() const;
 		Point Down() const;
 		Point Left() const;
 		Point Right() const;
-
-		enum class Direct {
-			up,
-			down,
-			left,
-			right,
-			center
-		};
-		static Direct RotateDirect(const Direct direct);
-		static Direct GetRandDirect();
-		Point MoveDirect(const Direct direct) const;
-
-		bool operator== (const Point point) const {
-			if (this->IsNan() || point.IsNan())
-				return false;
-			return x == point.x && y == point.y;
-		}
 	};
 
 	class Data {
 	public:
-		const HINSTANCE GetHInstance() const { return hInstance; };
+		HINSTANCE GetHInstance() const;
 
-		Size GetSize() const { return size; };
-		Scale GetScale() const { return scale; };
-		Level GetLevel() const { return level; };
+		Size GetSize() const;
+		Scale GetScale() const;
+		Level GetLevel() const;
 
-		UINT GetSizeUINT() const {
-			return static_cast<UINT>(size);
-		}
-		UINT GetScaleUINT() const {
-			return static_cast<UINT>(scale);
-		}
-		UINT GetLevelUINT() const {
-			return static_cast<UINT>(level);
-		}
+		UINT GetSizeUINT() const;
+		UINT GetScaleUINT() const;
+		UINT GetLevelUINT() const;
 	protected:
-		Data(const HINSTANCE hInstance_ = NULL) :
-			hInstance{ hInstance_ },
-			size{ Size::size_10 },
-			scale{ Scale::scale_2 },
-			level{ Level::level_4 }
-		{
-			std::srand(std::time(NULL));
-		};
+		Data(const HINSTANCE hInstance_ = NULL);
 	private:
 		HINSTANCE hInstance;
 

@@ -6,11 +6,11 @@
 namespace board {
 	using namespace domain;
 
-	class BaseBoard :
+	class Board :
 		virtual Data
 	{
 	protected:
-		explicit BaseBoard(
+		explicit Board(
 			const Cell cell
 		);
 
@@ -27,6 +27,9 @@ namespace board {
 		Point GetRandPoint(
 			const Cell cell
 		) const;
+		const std::vector<Cell>& Release() const {
+			return board;
+		};
 
 	private:
 		using Vector = std::vector<Cell>;
@@ -36,26 +39,18 @@ namespace board {
 
 	class Sea :
 		virtual Data,
-		protected BaseBoard
+		protected Board
 	{
 	protected:
 		explicit Sea() :
-			BaseBoard(Cell::sea) {};
+			Board(Cell::sea) {};
 	};
 
 	class Sky :
 		virtual Data,
-		protected BaseBoard {
+		protected Board {
 	protected:
 		explicit Sky() :
-			BaseBoard(Cell::sky) {};
-	};
-
-	class Board :
-		virtual Data,
-		protected Sea,
-		protected Sky {
-	protected:
-		explicit Board() = default;
+			Board(Cell::sky) {};
 	};
 }

@@ -9,9 +9,10 @@ Enemy::Enemy(const HWND hWnd) :
 	Draw{ hWnd, IDC::FRAMEENEMY }
 {
 	Draw::Fill(Cell::sky);
+	EnableWindow(Enemy::GetHWND(), false);
 };
 void Enemy::LButtonDown(const LPARAM lParam) {
-
+	auto point{ GetPoint(lParam) };
 }
 Allies::Allies(const HWND hWnd) :
 	Draw{ hWnd, IDC::FRAMEALLIES }
@@ -36,23 +37,20 @@ FleetBattle::FleetBattle(const HINSTANCE hInstance) :
 	Allies{ Main::GetHWND() }
 {};
 void FleetBattle::Battle() {
-	if (auto check{ Allies::Status() }; check.has_value()) {
-		auto [level, diff] {check.value()};
-		std::wstring messing{ L"Too " };
-		if (Diff::down == diff)
-			messing += L"many ";
-		else
-			messing += L"few ";
-		messing += std::to_wstring(level) + L"-level ships";
-		MessageBox(Main::GetHWND(), messing.data(), L"Start fleet battle", MB_OK);
+	if (auto wstring_opt = Allies::Cancel(); wstring_opt) {
+		MessageBox(
+			Main::GetHWND(),
+			wstring_opt.value().data(),
+			L"Start fleet battle",
+			MB_OK
+		);
+		return;
 	}
+	Enemy::Random();
+	EnableWindow(Allies::GetHWND(), false);
+	EnableWindow(Enemy::GetHWND(), true);
 }
 void FleetBattle::Random() {
 	Allies::Random();
-	for (UINT x = 0, size = GetSizeUINT(); x < size; ++x) {
-		for (UINT y = 0; y < size; ++y) {
-			Allies::Draw::SetCell(Point{ x, y },
-				Allies::BaseBoard::GetCell(Point{ x, y }));
-		}
-	}
+	Allies::Draw::Fill(Allies::Board::Release());
 }

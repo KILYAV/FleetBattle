@@ -1,35 +1,64 @@
 #pragma once
 #include "Board.h"
 
+#include <string>
 #include <optional>
 
 namespace fleet {
 	using namespace domain;
 
-	class Fleet : virtual Data, protected board::BaseBoard {
+	class Fleet :
+		virtual Data,
+		protected board::Board
+	{
 	protected:
 		Fleet();
 
-		std::optional<std::pair<UINT, Diff>> Status() const;
+		std::optional<std::pair<UINT, bool>> Status() const;
 		std::optional<Cell> Manual(const Point point);
+
+		std::optional<std::wstring> Cancel() const;
 		void Random();
 	private:
-		using variant = std::pair<std::pair<UINT, UINT>, Diff>;
-		std::optional<variant> CheckLevel(const Point point) const;
+		bool CompareCell(
+			const Point point,
+			const Cell cell
+		) const;
+		bool CompareShip(
+			const Point point
+		) const;
+		bool CompareSea(
+			const Point point
+		) const;
+		bool CheckCorner(
+			const Point point
+		) const;
+		bool CheckSquare(
+			const Point point
+		) const;
 
-		bool CheckSquare(const Point point) const;
-		bool CheckCorner(const Point point) const;
-		std::pair<UINT, UINT> CheckLines(const Point point) const;
+		using Compare = bool (Fleet::*)(const Point) const;
+		using Direct = Point(Point::*)() const;
+		UINT CheckRaw(
+			Compare compare,
+			const Point prev,
+			Direct direct
+		) const;
 
-		UINT CheckUp(const Point point) const;
-		UINT CheckDown(const Point point) const;
-		UINT CheckRight(const Point point) const;
-		UINT CheckLeft(const Point point) const;
+		std::optional<std::tuple<UINT, UINT, bool>> LevelUp(
+			const Point point
+		) const;
+
+		Point GetCenter() const;
+		std::tuple<UINT, UINT, UINT, UINT> GetRaw(const Point center) const;
+		std::tuple<Point, UINT, UINT, UINT, UINT> GetPointRaw(
+			const Level level
+		) const;
+		UINT GetOffset(const UINT line, const Level level) const;
+		std::pair<Point, Direct> GetPointDirect(const Level level) const;
+		void GetShip(const Level level);
 
 		UINT GetMax() const { return GetSizeUINT() - 1; };
-
-		void CreateShip(const Level level);
-		Point LevelUp(const Point point);
 
 		std::vector<UINT> ranks;
 	};
