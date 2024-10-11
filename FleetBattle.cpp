@@ -13,6 +13,19 @@ Enemy::Enemy(const HWND hWnd) :
 };
 void Enemy::LButtonDown(const LPARAM lParam) {
 	auto point{ GetPoint(lParam) };
+	if (Cell::sky != Sky::GetCell(point)) {
+		return;
+	}
+	else if (Cell::sea == Sea::GetCell(point)) {
+		Sky::SetCell(point, Cell::sea);
+		Draw::SetCell(point, Cell::sea);
+		return;
+	}
+	else {
+		LevelUp(point);
+		Blast(point);
+		return;
+	}
 }
 Allies::Allies(const HWND hWnd) :
 	Draw{ hWnd, IDC::FRAMEALLIES }
@@ -21,7 +34,7 @@ Allies::Allies(const HWND hWnd) :
 };
 void Allies::LButtonDown(const LPARAM lParam) {
 	auto point{ GetPoint(lParam) };
-	if (auto check{ Fleet::Manual(point) }; check) {
+	if (auto check{ LevelUp(point) }; check) {
 		if (Cell::ship == check.value()) {
 			Draw::SetCell(point, Cell::ship);
 		}
@@ -52,5 +65,29 @@ void FleetBattle::Battle() {
 }
 void FleetBattle::Random() {
 	Allies::Random();
-	Allies::Draw::Fill(Allies::Board::Release());
+	Allies::Fill();
+}
+void Allies::Fill() const {
+	UINT size{ GetSizeUINT() };
+	for (UINT x = 0; x < size; ++x) {
+		for (UINT y = 0; y < size; ++y) {
+			Draw::SetCell(Point{ x, y }, Sea::GetCell(Point{ x,y }));
+		}
+	}
+}
+void Enemy::Blast(const Point point) {
+	UINT max = GetMax();
+	if (false == point.Up().Left().IsNan(max)) {
+		Draw::SetCell(point.Up().Left(), Cell::sea);
+	}
+	if (false == point.Up().Right().IsNan(max)) {
+		Draw::SetCell(point.Up().Right(), Cell::sea);
+	}
+	if (false == point.Down().Left().IsNan(max)) {
+		Draw::SetCell(point.Down().Left(), Cell::sea);
+	}
+	if (false == point.Down().Right().IsNan(max)) {
+		Draw::SetCell(point.Down().Right(), Cell::sea);
+	}
+	Draw::SetCell(point, Cell::ship);
 }

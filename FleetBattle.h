@@ -5,6 +5,8 @@
 //#include <string>
 
 namespace fleet_battle {
+	using namespace domain;
+
 	class Enemy :
 		virtual domain::Data,
 		protected frame::Draw,
@@ -13,6 +15,8 @@ namespace fleet_battle {
 	protected:
 		Enemy(const HWND hWnd);
 		void LButtonDown(const LPARAM lParam) override;
+	private:
+		void Blast(const Point point);
 	};
 
 	class Allies :
@@ -23,6 +27,8 @@ namespace fleet_battle {
 	protected:
 		Allies(const HWND hWnd);
 		void LButtonDown(const LPARAM lParam) override;
+	public:
+		void Fill() const;
 	};
 
 	class FleetBattle :

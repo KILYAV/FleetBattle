@@ -3,8 +3,7 @@
 
 using namespace fleet;
 
-Fleet::Fleet() :
-	Board{ Cell::sea }
+Fleet::Fleet()
 {
 	ranks.resize(GetLevelUINT());
 }
@@ -20,10 +19,10 @@ std::optional<std::pair<UINT, bool>> Fleet::Status() const {
 	}
 	return {};
 }
-std::optional<Cell> Fleet::Manual(
+std::optional<Cell> Fleet::LevelUp(
 	const Point point
 ) {
-	auto check{ Fleet::LevelUp(point) };
+	auto check{ Fleet::CheckUp(point) };
 	if (check) {
 		auto& [first, second, levelUp] { check.value() };
 		if (levelUp) {
@@ -38,11 +37,11 @@ std::optional<Cell> Fleet::Manual(
 		}
 		ranks[first + second] += levelUp ? +1 : -1;
 		if (levelUp) {
-			SetCell(point, Cell::ship);
+			Sea::SetCell(point, Cell::ship);
 			return { Cell::ship };
 		}
 		else {
-			SetCell(point, Cell::sea);
+			Sea::SetCell(point, Cell::sea);
 			return { Cell::sea };
 		}
 	}
@@ -63,7 +62,7 @@ std::optional<std::wstring> Fleet::Cancel() const {
 		return {};
 }
 void Fleet::Random() {
-	Fill(Cell::sea);
+	Sea::Fill(Cell::sea);
 	for (UINT index = 0, size = GetLevelUINT(), count = size;
 		index < size; ++index) {
 		ranks[index] = count--;
@@ -80,7 +79,7 @@ bool Fleet::CompareCell(
 	const Cell cell
 ) const {
 	if (false == point.IsNan(GetMax())) {
-		if (cell == GetCell(point)) {
+		if (cell == Sea::GetCell(point)) {
 			return true;
 		}
 	}
@@ -142,7 +141,7 @@ UINT Fleet::CheckRaw(
 			return CheckRaw(compare, next, direct) + 1;
 	return 0;
 }
-std::optional<std::tuple<UINT, UINT, bool>> Fleet::LevelUp(
+std::optional<std::tuple<UINT, UINT, bool>> Fleet::CheckUp(
 	const Point point
 ) const {
 	if (CheckCorner(point)) {
@@ -156,10 +155,10 @@ std::optional<std::tuple<UINT, UINT, bool>> Fleet::LevelUp(
 		CheckRaw(&Fleet::CompareShip, point, &Point::Down) +
 		CheckRaw(&Fleet::CompareShip, point, &Point::Right)
 	};
-	if (Cell::sea == GetCell(point)) {
+	if (Cell::sea == Sea::GetCell(point)) {
 		return { { first, second, true } };
 	}
-	else if (Cell::ship == GetCell(point)) {
+	else if (Cell::ship == Sea::GetCell(point)) {
 		return { { first, second, false } };
 	}
 	else
@@ -174,7 +173,7 @@ enum Direct {
 Point Fleet::GetCenter() const {
 	Point point;
 	do {
-		point = GetRandPoint(Cell::sea);
+		point = Sea::GetRandPoint(Cell::sea);
 	} while (CheckSquare(point));
 	return point;
 }
@@ -254,7 +253,7 @@ void Fleet::GetShip(const Level level) {
 	auto [point, direct] = GetPointDirect(level);
 	for (UINT index = 0, size = static_cast<UINT>(level);
 		index < size; ++index) {
-		SetCell(point, Cell::ship);
+		Sea::SetCell(point, Cell::ship);
 		point = (&point->*direct)();
 	}
 }

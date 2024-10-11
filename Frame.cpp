@@ -143,18 +143,6 @@ void Draw::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
-void Draw::Fill(
-	const std::vector<Cell>& vector
-) const {
-	UINT size{ GetSizeUINT() };
-	for (UINT index = 0, max = vector.size();
-		index < max; ++index) {
-		SetCell(
-			Point{ index % size, index / size },
-			vector[index]
-		);
-	}
-}
 void Draw::Fill(const Cell cell) const {
 	if (Draw::type != cell) {
 		SelectCell(cell);

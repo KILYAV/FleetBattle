@@ -15,10 +15,12 @@ namespace fleet {
 		Fleet();
 
 		std::optional<std::pair<UINT, bool>> Status() const;
-		std::optional<Cell> Manual(const Point point);
+		std::optional<Cell> LevelUp(const Point point);
 
 		std::optional<std::wstring> Cancel() const;
 		void Random();
+
+		UINT GetMax() const { return GetSizeUINT() - 1; };
 	private:
 		bool CompareCell(
 			const Point point,
@@ -45,7 +47,7 @@ namespace fleet {
 			Direct direct
 		) const;
 
-		std::optional<std::tuple<UINT, UINT, bool>> LevelUp(
+		std::optional<std::tuple<UINT, UINT, bool>> CheckUp(
 			const Point point
 		) const;
 
@@ -57,8 +59,6 @@ namespace fleet {
 		UINT GetOffset(const UINT line, const Level level) const;
 		std::pair<Point, Direct> GetPointDirect(const Level level) const;
 		void GetShip(const Level level);
-
-		UINT GetMax() const { return GetSizeUINT() - 1; };
 
 		std::vector<UINT> ranks;
 	};
