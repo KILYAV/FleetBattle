@@ -66,6 +66,7 @@ namespace domain {
 		Scale GetScale() const;
 		Level GetLevel() const;
 
+		UINT GetMaxUINT() const;
 		UINT GetSizeUINT() const;
 		UINT GetScaleUINT() const;
 		UINT GetLevelUINT() const;

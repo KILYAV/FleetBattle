@@ -3,6 +3,24 @@
 
 using namespace fleet;
 
+enum Direct {
+	up,
+	left,
+	ver,
+	hor
+};
+
+struct OR {
+	static bool Operator(bool lft, bool rht) {
+		return lft || rht;
+	}
+};
+struct AND {
+	static bool Operator(bool lft, bool rht) {
+		return lft && rht;
+	}
+};
+
 Fleet::Fleet()
 {
 	ranks.resize(GetLevelUINT());
@@ -22,21 +40,21 @@ std::optional<std::pair<UINT, bool>> Fleet::Status() const {
 std::optional<Cell> Fleet::LevelUp(
 	const Point point
 ) {
-	auto check{ Fleet::CheckUp(point) };
+	auto check{ CheckUp(point) };
 	if (check) {
-		auto& [first, second, levelUp] { check.value() };
-		if (levelUp) {
+		auto& [first, second, level] { check.value() };
+		if (level) {
 			if (first + second >= GetLevelUINT())
 				return {};
 		}
 		if (first) {
-			ranks[first - 1]  += levelUp ? -1 : +1;
+			ranks[first - 1]  += level ? -1 : +1;
 		}
 		if (second) {
-			ranks[second - 1] += levelUp ? -1 : +1;
+			ranks[second - 1] += level ? -1 : +1;
 		}
-		ranks[first + second] += levelUp ? +1 : -1;
-		if (levelUp) {
+		ranks[first + second] += level ? +1 : -1;
+		if (level) {
 			Sea::SetCell(point, Cell::ship);
 			return { Cell::ship };
 		}
@@ -46,6 +64,25 @@ std::optional<Cell> Fleet::LevelUp(
 		}
 	}
 	return {};
+}
+bool Fleet::LevelDown(const Point point) {
+	auto [first, second, level] { CheckUp(point).value() };
+	if (first) {
+		--ranks[first - 1];
+	}
+	if (second) {
+		--ranks[second - 1];
+	}
+	++ranks[first + second];
+
+	Sea::SetCell(point, Cell::sea);
+	Sky::SetCell(point, Cell::ship);
+
+	if (false == CheckFace<Sky, OR>(point, Cell::ship))
+		if (false == CheckFace<Sea, OR>(point, Cell::ship))
+			return true;
+
+	return false;
 }
 std::optional<std::wstring> Fleet::Cancel() const {
 	if (auto check = Status(); check.has_value()) {
@@ -74,86 +111,98 @@ void Fleet::Random() {
 		}
 	}
 }
+template<class Board_tmp>
 bool Fleet::CompareCell(
 	const Point point,
 	const Cell cell
 ) const {
-	if (false == point.IsNan(GetMax())) {
-		if (cell == Sea::GetCell(point)) {
+	if (false == point.IsNan(GetMaxUINT())) {
+		if (cell == Board_tmp::GetCell(point)) {
 			return true;
 		}
 	}
 	return false;
 }
-bool Fleet::CompareShip(
-	const Point point
-) const {
-	return
-		CompareCell(point, Cell::ship);
-}
 bool Fleet::CompareSea(
-	const Point point
+	const Point point,
+	const Cell cell
 ) const {
-	if (CheckSquare(point))
+	if (CheckSquare<Sea, OR>(point, Cell::ship))
 		return false;
 	else {
-		return CompareCell(point, Cell::sea);
+		return CompareCell<Sea>(point, Cell::sea);
 	}
 }
+template<class Board_tmp, class Combination>
 bool Fleet::CheckCorner(
-	const Point point
+	const Point point,
+	const Cell cell
 ) const {
 	const bool comp[]{
-		CompareShip(point.Up().Left()),
-		CompareShip(point.Up().Right()),
-		CompareShip(point.Down().Left()),
-		CompareShip(point.Down().Right())
+		CompareCell<Board_tmp>(point.Up().Left(),    cell),
+		CompareCell<Board_tmp>(point.Up().Right(),   cell),
+		CompareCell<Board_tmp>(point.Down().Left(),  cell),
+		CompareCell<Board_tmp>(point.Down().Right(), cell)
 	};
 	bool result = comp[0];
 	for (UINT index = 1, size = std::size(comp); index < size; ++index) {
-		result |= comp[index];
+		result = Combination::Operator(result, comp[index]);
 	}
 	return result;
 }
-bool Fleet::CheckSquare(
-	const Point point
+template<class Board_tmp, class Combination>
+bool Fleet::CheckFace(
+	const Point point,
+	const Cell cell
 ) const {
 	const bool comp[]{
-		CompareShip(point.Up()),
-		CompareShip(point.Down()),
-		CompareShip(point.Left()),
-		CompareShip(point.Right()),
+		CompareCell<Board_tmp>(point.Up(),    cell),
+		CompareCell<Board_tmp>(point.Down(),  cell),
+		CompareCell<Board_tmp>(point.Left(),  cell),
+		CompareCell<Board_tmp>(point.Right(), cell),
 	};
-	bool result = CheckCorner(point);
-	for (UINT index = 0, size = std::size(comp); index < size; ++index) {
-		result |= comp[index];
+	bool result = comp[0];
+	for (UINT index = 1, size = std::size(comp); index < size; ++index) {
+		result = Combination::Operator(result, comp[index]);
 	}
 	return result;
 }
-UINT Fleet::CheckRaw(
-	Compare compare,
-	const Point prev,
-	Direct direct
+template<class Board_tmp, class Combination>
+bool Fleet::CheckSquare(
+	const Point point,
+	const Cell cell
 ) const {
-	Point next = (&prev->*direct)();
-	if (false == next.IsNan(GetMax()))
-		if ((this->*compare)(next))
-			return CheckRaw(compare, next, direct) + 1;
+	return 
+		Combination::Operator(
+			CheckCorner<Board_tmp, Combination>(point, cell),
+			CheckFace<Board_tmp, Combination>(point, cell)
+		);
+}
+UINT Fleet::CheckRaw(
+	const Compare compare,
+	const Cell cell,
+	const Point prev,
+	const Direct direct
+) const {
+	Point point = (&prev->*direct)();
+	if (false == point.IsNan(GetMaxUINT()))
+		if ((this->*compare)(point, cell))
+			return CheckRaw(compare, cell, point, direct) + 1;
 	return 0;
 }
 std::optional<std::tuple<UINT, UINT, bool>> Fleet::CheckUp(
 	const Point point
 ) const {
-	if (CheckCorner(point)) {
+	if (CheckCorner<Sea, OR>(point, Cell::ship)) {
 		return {};
 	}
 	UINT first{
-		CheckRaw(&Fleet::CompareShip, point, &Point::Up) +
-		CheckRaw(&Fleet::CompareShip, point, &Point::Left)
+		CheckRaw(&Fleet::CompareCell<Sea>, Cell::ship, point, &Point::Up) +
+		CheckRaw(&Fleet::CompareCell<Sea>, Cell::ship, point, &Point::Left)
 	};
 	UINT second{
-		CheckRaw(&Fleet::CompareShip, point, &Point::Down) +
-		CheckRaw(&Fleet::CompareShip, point, &Point::Right)
+		CheckRaw(&Fleet::CompareCell<Sea>, Cell::ship, point, &Point::Down) +
+		CheckRaw(&Fleet::CompareCell<Sea>, Cell::ship, point, &Point::Right)
 	};
 	if (Cell::sea == Sea::GetCell(point)) {
 		return { { first, second, true } };
@@ -164,26 +213,20 @@ std::optional<std::tuple<UINT, UINT, bool>> Fleet::CheckUp(
 	else
 		return {};
 }
-enum Direct {
-	up,
-	left,
-	ver,
-	hor
-};
 Point Fleet::GetCenter() const {
 	Point point;
 	do {
 		point = Sea::GetRandPoint(Cell::sea);
-	} while (CheckSquare(point));
+	} while (CheckSquare<Sea, OR>(point, Cell::ship));
 	return point;
 }
 std::tuple<UINT, UINT, UINT, UINT> Fleet::GetRaw(
 	const Point point
 ) const {
-	UINT up   = CheckRaw(&Fleet::CompareSea, point, &Point::Up);
-	UINT left = CheckRaw(&Fleet::CompareSea, point, &Point::Left);
-	UINT ver  = CheckRaw(&Fleet::CompareSea, point, &Point::Down);
-	UINT hor  = CheckRaw(&Fleet::CompareSea, point, &Point::Right);
+	UINT up   = CheckRaw(&Fleet::CompareSea, Cell::ship, point, &Point::Up);
+	UINT left = CheckRaw(&Fleet::CompareSea, Cell::ship, point, &Point::Left);
+	UINT ver  = CheckRaw(&Fleet::CompareSea, Cell::ship, point, &Point::Down);
+	UINT hor  = CheckRaw(&Fleet::CompareSea, Cell::ship, point, &Point::Right);
 
 	ver  = ver + up + 1;
 	hor  = hor + left + 1;

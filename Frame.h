@@ -55,8 +55,9 @@ namespace frame {
 
 	class FrameInterface {
 	public:
-		virtual void SetCell(const Point point, const Cell cell) const {};
-		virtual void Fill(const Cell cell) const {};
+		virtual void SetCell(const Point point, const Cell cell) const = 0;
+		virtual void HitBlast(const Point point) const = 0;
+		virtual void Fill(const Cell cell) const = 0;
 	};
 
 	class Draw :
@@ -71,6 +72,7 @@ namespace frame {
 		explicit Draw(const HWND hWnd, const IDC IDC_FRAME);
 
 		void SetCell(const Point point, const Cell cell) const override;
+		void HitBlast(const Point point) const override;
 		void Fill(const Cell cell) const override;
 	private:
 		HDC hDC;

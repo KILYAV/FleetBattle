@@ -143,6 +143,22 @@ void Draw::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
+void Draw::HitBlast(const Point point) const {
+	UINT max = GetMaxUINT();
+	if (false == point.Up().Left().IsNan(max)) {
+		Draw::SetCell(point.Up().Left(), Cell::sea);
+	}
+	if (false == point.Up().Right().IsNan(max)) {
+		Draw::SetCell(point.Up().Right(), Cell::sea);
+	}
+	if (false == point.Down().Left().IsNan(max)) {
+		Draw::SetCell(point.Down().Left(), Cell::sea);
+	}
+	if (false == point.Down().Right().IsNan(max)) {
+		Draw::SetCell(point.Down().Right(), Cell::sea);
+	}
+	Draw::SetCell(point, Cell::ship);
+}
 void Draw::Fill(const Cell cell) const {
 	if (Draw::type != cell) {
 		SelectCell(cell);

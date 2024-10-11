@@ -15,8 +15,6 @@ namespace fleet_battle {
 	protected:
 		Enemy(const HWND hWnd);
 		void LButtonDown(const LPARAM lParam) override;
-	private:
-		void Blast(const Point point);
 	};
 
 	class Allies :

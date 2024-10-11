@@ -22,8 +22,9 @@ void Enemy::LButtonDown(const LPARAM lParam) {
 		return;
 	}
 	else {
-		LevelUp(point);
-		Blast(point);
+		if (LevelDown(point))
+			;
+		HitBlast(point);
 		return;
 	}
 }
@@ -74,20 +75,4 @@ void Allies::Fill() const {
 			Draw::SetCell(Point{ x, y }, Sea::GetCell(Point{ x,y }));
 		}
 	}
-}
-void Enemy::Blast(const Point point) {
-	UINT max = GetMax();
-	if (false == point.Up().Left().IsNan(max)) {
-		Draw::SetCell(point.Up().Left(), Cell::sea);
-	}
-	if (false == point.Up().Right().IsNan(max)) {
-		Draw::SetCell(point.Up().Right(), Cell::sea);
-	}
-	if (false == point.Down().Left().IsNan(max)) {
-		Draw::SetCell(point.Down().Left(), Cell::sea);
-	}
-	if (false == point.Down().Right().IsNan(max)) {
-		Draw::SetCell(point.Down().Right(), Cell::sea);
-	}
-	Draw::SetCell(point, Cell::ship);
 }

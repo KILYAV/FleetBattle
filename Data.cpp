@@ -50,6 +50,9 @@ Scale Data::GetScale() const {
 Level Data::GetLevel() const {
 	return level;
 };
+UINT Data::GetMaxUINT() const {
+	return static_cast<UINT>(size) - 1;
+}
 UINT Data::GetSizeUINT() const {
 	return static_cast<UINT>(size);
 }
