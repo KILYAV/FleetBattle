@@ -22,8 +22,8 @@ void Enemy::LButtonDown(const LPARAM lParam) {
 		return;
 	}
 	else {
-		if (LevelDown(point))
-			;
+		if (auto points = LevelDown(point); points)
+			DeadBlast(points.value());
 		HitBlast(point);
 		return;
 	}
@@ -36,12 +36,7 @@ Allies::Allies(const HWND hWnd) :
 void Allies::LButtonDown(const LPARAM lParam) {
 	auto point{ GetPoint(lParam) };
 	if (auto check{ LevelUp(point) }; check) {
-		if (Cell::ship == check.value()) {
-			Draw::SetCell(point, Cell::ship);
-		}
-		else {
-			Draw::SetCell(point, Cell::sea);
-		}
+		Draw::SetCell(point, check.value());
 	}
 }
 FleetBattle::FleetBattle(const HINSTANCE hInstance) :
@@ -60,12 +55,12 @@ void FleetBattle::Battle() {
 		);
 		return;
 	}
-	Enemy::Random();
+	Enemy::Order();
 	EnableWindow(Allies::GetHWND(), false);
 	EnableWindow(Enemy::GetHWND(), true);
 }
 void FleetBattle::Random() {
-	Allies::Random();
+	Allies::Order();
 	Allies::Fill();
 }
 void Allies::Fill() const {

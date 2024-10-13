@@ -130,21 +130,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Compare.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="Fleet.h" />
     <ClInclude Include="FleetBattle.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Manual.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Compare.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Fleet.cpp" />
     <ClCompile Include="FleetBattle.cpp" />
     <ClCompile Include="Frame.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Manual.cpp" />
+    <ClCompile Include="Random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FleetBattle.rc" />

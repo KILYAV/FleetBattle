@@ -129,7 +129,8 @@ Draw::Draw(
 	SelectCell(Cell::sea);
 }
 void Draw::SetCell(
-	const Point point, const Cell cell) const {
+	const Point point, const Cell cell
+) const {
 	if (Draw::type != cell) {
 		SelectCell(cell);
 		Draw::type = cell;
@@ -143,7 +144,32 @@ void Draw::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
-void Draw::HitBlast(const Point point) const {
+void Draw::DeadBlast(
+	const std::tuple<Point, Point, Point, Point> points
+) const {
+	enum Direct {
+		up,
+		down,
+		left,
+		right
+	};
+	UINT max = GetMaxUINT();
+	if (false == std::get<up>(points).IsNan(max)) {
+		Draw::SetCell(std::get<up>(points), Cell::sea);
+	}
+	if (false == std::get<down>(points).IsNan(max)) {
+		Draw::SetCell(std::get<left>(points), Cell::sea);
+	}
+	if (false == std::get<left>(points).IsNan(max)) {
+		Draw::SetCell(std::get<left>(points), Cell::sea);
+	}
+	if (false == std::get<right>(points).IsNan(max)) {
+		Draw::SetCell(std::get<right>(points), Cell::sea);
+	}
+}
+void Draw::HitBlast(
+	const Point point
+) const {
 	UINT max = GetMaxUINT();
 	if (false == point.Up().Left().IsNan(max)) {
 		Draw::SetCell(point.Up().Left(), Cell::sea);
@@ -159,7 +185,9 @@ void Draw::HitBlast(const Point point) const {
 	}
 	Draw::SetCell(point, Cell::ship);
 }
-void Draw::Fill(const Cell cell) const {
+void Draw::Fill(
+	const Cell cell
+) const {
 	if (Draw::type != cell) {
 		SelectCell(cell);
 		Draw::type = cell;
@@ -178,7 +206,9 @@ void Draw::Fill(const Cell cell) const {
 		}
 	}
 }
-void Draw::SelectCell(const Cell cell) const {
+void Draw::SelectCell(
+	const Cell cell
+) const {
 	enum class Color {
 		Blace = 0x000000,
 		Red   = 0x0000FF,
@@ -211,8 +241,12 @@ void Draw::SelectCell(const Cell cell) const {
 		SelectObject(hDC, ship.pen);
 	}
 }
-LRESULT CALLBACK Draw::CallBackDraw(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK Draw::CallBackDraw(
+	HWND hWnd,
+	UINT message,
+	WPARAM wParam,
+	LPARAM lParam
+) {
 	switch (message)
 	{
 	case WM_LBUTTONDOWN:

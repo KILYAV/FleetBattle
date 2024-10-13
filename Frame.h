@@ -53,27 +53,32 @@ namespace frame {
 		static LRESULT CALLBACK CallBackMain(HWND, UINT, WPARAM, LPARAM);
 	};
 
-	class FrameInterface {
-	public:
-		virtual void SetCell(const Point point, const Cell cell) const = 0;
-		virtual void HitBlast(const Point point) const = 0;
-		virtual void Fill(const Cell cell) const = 0;
-	};
-
 	class Draw :
 		virtual Data,
-		public Frame,
-		protected FrameInterface
+		public Frame
 	{
 	public:
 		virtual void LButtonDown(const LPARAM lParam) = 0;
 
 	protected:
-		explicit Draw(const HWND hWnd, const IDC IDC_FRAME);
+		explicit Draw(
+			const HWND hWnd,
+			const IDC IDC_FRAME
+		);
 
-		void SetCell(const Point point, const Cell cell) const override;
-		void HitBlast(const Point point) const override;
-		void Fill(const Cell cell) const override;
+		void SetCell(
+			const Point point,
+			const Cell cell
+		) const;
+		void DeadBlast(
+			const std::tuple<Point, Point, Point, Point>
+		) const;
+		void HitBlast(
+			const Point point
+		) const;
+		void Fill(
+			const Cell cell
+		) const;
 	private:
 		HDC hDC;
 		mutable Cell type = Cell::sea;
