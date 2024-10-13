@@ -29,7 +29,7 @@ namespace manual {
 		std::optional<std::tuple<UINT, UINT, bool>> CheckUp(
 			const Point point
 		) const;
-		Point GetEndPoint(
+		std::optional<Point> GetEndPoint(
 			const Point start,
 			const Direct direct
 		) const;

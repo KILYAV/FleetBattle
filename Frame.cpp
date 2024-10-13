@@ -25,7 +25,12 @@ Frame::Frame(
 
 	auto hInstance{ GetHInstance() };
 	WCHAR szWindowClass[MAX_LOADSTRING];
-	LoadStringW(hInstance, static_cast<UINT>(IDC_FRAME), szWindowClass, MAX_LOADSTRING);
+	LoadStringW(
+		hInstance,
+		static_cast<UINT>(IDC_FRAME),
+		szWindowClass,
+		MAX_LOADSTRING
+	);
 
 	wcex.lpfnWndProc = WndProc;
 	wcex.hInstance = hInstance;
@@ -33,15 +38,41 @@ Frame::Frame(
 	RegisterClassExW(&wcex);
 
 	if (hWnd) {
-		Frame::hWnd = CreateWindowW(szWindowClass, nullptr, WS_CHILD /* | WS_DISABLED */,
-			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, hWnd, nullptr, hInstance, nullptr);
+		Frame::hWnd = CreateWindowW(
+			szWindowClass,
+			nullptr,
+			WS_CHILD /* | WS_DISABLED */,
+			CW_USEDEFAULT,
+			0,
+			CW_USEDEFAULT,
+			0,
+			hWnd,
+			nullptr,
+			hInstance,
+			nullptr
+		);
 	}
 	else {
 		WCHAR szTitle[MAX_LOADSTRING];
-		LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-		Frame::hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPED | WS_SYSMENU
-			| WS_MINIMIZEBOX, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr,
-			nullptr, hInstance, nullptr);
+		LoadStringW(
+			hInstance,
+			IDS_APP_TITLE,
+			szTitle,
+			MAX_LOADSTRING
+		);
+		Frame::hWnd = CreateWindowW(
+			szWindowClass,
+			szTitle,
+			WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
+			CW_USEDEFAULT,
+			0,
+			CW_USEDEFAULT,
+			0,
+			nullptr,
+			nullptr,
+			hInstance,
+			nullptr
+		);
 	}
 	VariantInstance(std::pair{ GetHWND(), this});
 }
@@ -158,7 +189,7 @@ void Draw::DeadBlast(
 		Draw::SetCell(std::get<up>(points), Cell::sea);
 	}
 	if (false == std::get<down>(points).IsNan(max)) {
-		Draw::SetCell(std::get<left>(points), Cell::sea);
+		Draw::SetCell(std::get<down>(points), Cell::sea);
 	}
 	if (false == std::get<left>(points).IsNan(max)) {
 		Draw::SetCell(std::get<left>(points), Cell::sea);
@@ -183,7 +214,7 @@ void Draw::HitBlast(
 	if (false == point.Down().Right().IsNan(max)) {
 		Draw::SetCell(point.Down().Right(), Cell::sea);
 	}
-	Draw::SetCell(point, Cell::ship);
+	Draw::SetCell(point, Cell::blast);
 }
 void Draw::Fill(
 	const Cell cell
@@ -226,6 +257,7 @@ void Draw::SelectCell(
 	static const Cell sea{ Color::Blue, Color::White };
 	static const Cell sky{ Color::White, Color::Blue };
 	static const Cell ship{ Color::Blace, Color::Blace };
+	static const Cell blast{ Color::Red, Color::Red };
 
 	switch (static_cast<UINT>(cell)) {
 	case(static_cast<UINT>(domain::Cell::sea)):
@@ -236,9 +268,13 @@ void Draw::SelectCell(
 		SelectObject(hDC, sky.brush);
 		SelectObject(hDC, sky.pen);
 		break;
-	default:
+	case(static_cast<UINT>(domain::Cell::ship)):
 		SelectObject(hDC, ship.brush);
 		SelectObject(hDC, ship.pen);
+		break;
+	default:
+		SelectObject(hDC, blast.brush);
+		SelectObject(hDC, blast.pen);
 	}
 }
 LRESULT CALLBACK Draw::CallBackDraw(

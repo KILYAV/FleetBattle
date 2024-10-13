@@ -22,7 +22,8 @@ namespace domain {
 	enum class Cell {
 		sea,
 		sky,
-		ship
+		ship,
+		blast
 	};
 
 	static UINT GetRandUINT(const UINT max) {

@@ -43,16 +43,15 @@ Manual::EndPoints Manual::LevelDown(const Point point) {
 	++ranks[first + second];
 
 	Sea::SetCell(point, Cell::sea);
-	Sky::SetCell(point, Cell::ship);
+	Sky::SetCell(point, Cell::blast);
 
-	Point up = GetEndPoint(point, &Point::Up);
-	Point down = GetEndPoint(point, &Point::Down);
-	Point left = GetEndPoint(point, &Point::Left);
-	Point right = GetEndPoint(point, &Point::Right);
+	std::optional<Point> up = GetEndPoint(point, &Point::Up);
+	std::optional<Point> down = GetEndPoint(point, &Point::Down);
+	std::optional<Point> left = GetEndPoint(point, &Point::Left);
+	std::optional<Point> right = GetEndPoint(point, &Point::Right);
 
-	if (((false == up.IsNan()) && (false == down.IsNan())) ||
-		((false == left.IsNan()) && (false == right.IsNan())))
-		return { { up, down, left, right } };
+	if (up && down && left && right)
+		return std::tuple{ up.value(), down.value(), left.value(), right.value() };
 
 	return {};
 }
@@ -79,21 +78,21 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 	else
 		return {};
 }
-Point Manual::GetEndPoint(
+std::optional<Point> Manual::GetEndPoint(
 	const Point start,
 	const Direct direct
 ) const {
 	UINT max = GetMaxUINT();
 	Point point = (&start->*direct)();
 	if (false == point.IsNan(max)) {
-		while (Cell::ship == Sky::GetCell(point)) {
+		while (Cell::blast == Sky::GetCell(point)) {
 			point = (&point->*direct)();
-			if (false == point.IsNan(max)) {
+			if (point.IsNan(max)) {
 				return Point{};
 			}
 		}
 		if (Cell::ship == Sea::GetCell(point)) {
-			return Point{};
+			return {};
 		}
 		else {
 			return point;
