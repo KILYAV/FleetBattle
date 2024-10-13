@@ -42,7 +42,7 @@ Manual::EndPoints Manual::LevelDown(const Point point) {
 	}
 	++ranks[first + second];
 
-	Sea::SetCell(point, Cell::sea);
+	Sea::SetCell(point, Cell::blast);
 	Sky::SetCell(point, Cell::blast);
 
 	std::optional<Point> up = GetEndPoint(point, &Point::Up);
@@ -69,6 +69,12 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Down) +
 		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Right)
 	};
+	if (Cell::ship == Sea::GetCell(point)) {
+		return { { first, second, false } };
+	}
+	else
+		return { { first, second, true } };
+	/*
 	if (Cell::sea == Sea::GetCell(point)) {
 		return { { first, second, true } };
 	}
@@ -77,6 +83,7 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 	}
 	else
 		return {};
+		*/
 }
 std::optional<Point> Manual::GetEndPoint(
 	const Point start,

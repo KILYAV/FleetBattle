@@ -175,47 +175,6 @@ void Frame::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
-void Frame::DeadBlast(
-	const std::tuple<Point, Point, Point, Point> points
-) const {
-	enum Direct {
-		up,
-		down,
-		left,
-		right
-	};
-	UINT max = GetMaxUINT();
-	if (false == std::get<up>(points).IsNan(max)) {
-		Frame::SetCell(std::get<up>(points), Cell::missle);
-	}
-	if (false == std::get<down>(points).IsNan(max)) {
-		Frame::SetCell(std::get<down>(points), Cell::missle);
-	}
-	if (false == std::get<left>(points).IsNan(max)) {
-		Frame::SetCell(std::get<left>(points), Cell::missle);
-	}
-	if (false == std::get<right>(points).IsNan(max)) {
-		Frame::SetCell(std::get<right>(points), Cell::missle);
-	}
-}
-void Frame::HitBlast(
-	const Point point
-) const {
-	UINT max = GetMaxUINT();
-	if (false == point.Up().Left().IsNan(max)) {
-		Frame::SetCell(point.Up().Left(), Cell::missle);
-	}
-	if (false == point.Up().Right().IsNan(max)) {
-		Frame::SetCell(point.Up().Right(), Cell::missle);
-	}
-	if (false == point.Down().Left().IsNan(max)) {
-		Frame::SetCell(point.Down().Left(), Cell::missle);
-	}
-	if (false == point.Down().Right().IsNan(max)) {
-		Frame::SetCell(point.Down().Right(), Cell::missle);
-	}
-	Frame::SetCell(point, Cell::blast);
-}
 void Frame::Fill(
 	const Cell cell
 ) const {

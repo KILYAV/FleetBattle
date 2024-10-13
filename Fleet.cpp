@@ -58,14 +58,62 @@ std::optional<std::wstring> Fleet::Cancel() const {
 	else
 		return {};
 }
+void Fleet::SetCell(
+	const Point point,
+	const Cell cell
+) {
+	Sky::SetCell(point, cell);
+	Sea::SetCell(point, cell);
+	Frame::SetCell(point, cell);
+}
+void Fleet::HitBlast(
+	const Point point
+) {
+	UINT max = GetMaxUINT();
+	if (false == point.Up().Left().IsNan(max)) {
+		SetCell(point.Up().Left(), Cell::missle);
+	}
+	if (false == point.Up().Right().IsNan(max)) {
+		SetCell(point.Up().Right(), Cell::missle);
+	}
+	if (false == point.Down().Left().IsNan(max)) {
+		SetCell(point.Down().Left(), Cell::missle);
+	}
+	if (false == point.Down().Right().IsNan(max)) {
+		SetCell(point.Down().Right(), Cell::missle);
+	}
+	Frame::SetCell(point, Cell::blast);
+}
+void Fleet::DeadBlast(
+	const std::tuple<Point, Point, Point, Point> points
+) {
+	enum Direct {
+		up,
+		down,
+		left,
+		right
+	};
+	UINT max = GetMaxUINT();
+	if (false == std::get<up>(points).IsNan(max)) {
+		SetCell(std::get<up>(points), Cell::missle);
+	}
+	if (false == std::get<down>(points).IsNan(max)) {
+		SetCell(std::get<down>(points), Cell::missle);
+	}
+	if (false == std::get<left>(points).IsNan(max)) {
+		SetCell(std::get<left>(points), Cell::missle);
+	}
+	if (false == std::get<right>(points).IsNan(max)) {
+		SetCell(std::get<right>(points), Cell::missle);
+	}
+}
 void Enemy::LButtonDown(const LPARAM lParam) {
 	auto point = GetPoint(lParam);
 	if (Cell::sky != Sky::GetCell(point)) {
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
-		Sky::SetCell(point, Cell::missle);
-		Frame::SetCell(point, Cell::missle);
+		SetCell(point, Cell::missle);
 		ShotBack();
 		return;
 	}
@@ -82,13 +130,31 @@ void Allies::LButtonDown(const LPARAM lParam) {
 		Frame::SetCell(point, check.value());
 	}
 }
-void Allies::EnemyShot() {
-	auto point = Sky::GetRandPoint(Cell::sky);
-	if (Cell::sea == Sea::GetCell(point)) {
-		Sky::SetCell(point, Cell::missle);
-		Sea::SetCell(point, Cell::missle);
-		Frame::SetCell(point, Cell::missle);
-		return;
+void Allies::EnemyShot(
+	std::optional<Point> point
+) {
+	enum Direct {
+		up,
+		down,
+		left,
+		right
+	};
+	if (point) {
+		;
+	}
+	else {
+		auto random = Sky::GetRandPoint(Cell::sky);
+		if (Cell::sea == Sea::GetCell(random)) {
+			SetCell(random, Cell::missle);
+			return;
+		}
+		else if (Cell::ship == Sea::GetCell(random)) {
+			SetCell(random, Cell::blast);
+			if (auto points = LevelDown(random); points)
+				DeadBlast(points.value());
+			HitBlast(random);
+			return EnemyShot(random);
+		}
 	}
 }
 void Allies::Fill() const {

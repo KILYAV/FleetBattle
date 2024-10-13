@@ -19,7 +19,18 @@ namespace fleet {
 		std::optional<std::pair<UINT, bool>> Status() const;
 		std::optional<std::wstring> Cancel() const;
 
+		void SetCell(
+			const Point point,
+			const Cell cell
+		);
+		void HitBlast(
+			const Point point
+		);
+		void DeadBlast(
+			const std::tuple<Point, Point, Point, Point>
+		);
 	private:
+
 		std::vector<UINT>& Ranks() override;
 
 		std::vector<UINT> ranks;
@@ -47,7 +58,9 @@ namespace fleet {
 		{};
 
 		void LButtonDown(const LPARAM lParam) override;
-		void EnemyShot();
+		void EnemyShot(
+			std::optional<Point> point = {}
+		);
 		void Fill() const;
 	};
 

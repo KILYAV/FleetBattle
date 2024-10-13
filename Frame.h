@@ -70,12 +70,7 @@ namespace frame {
 			const Point point,
 			const Cell cell
 		) const;
-		void DeadBlast(
-			const std::tuple<Point, Point, Point, Point>
-		) const;
-		void HitBlast(
-			const Point point
-		) const;
+
 		void Fill(
 			const Cell cell
 		) const;
