@@ -8,7 +8,7 @@
 namespace frame {
 	using namespace domain;
 
-	class Frame :
+	class BaseFrame :
 		virtual Data
 	{
 	protected:
@@ -17,7 +17,7 @@ namespace frame {
 			FRAMEENEMY = IDC_FRAMEENEMY,
 			FRAMEALLIES = IDC_FRAMEALLIES
 		};
-		explicit Frame(
+		explicit BaseFrame(
 			const WNDPROC WndProc,
 			const HWND hWnd,
 			const IDC IDC_FRAME
@@ -30,18 +30,18 @@ namespace frame {
 
 	private:
 		HWND hWnd;
-		static Frame* VariantInstance(
-			std::variant<const HWND, std::pair<const HWND, Frame*>> variant
+		static BaseFrame* VariantInstance(
+			std::variant<const HWND, std::pair<const HWND, BaseFrame*>> variant
 		);
 	};
 	template<class Type>
-	Type& Frame::GetInstance(const HWND hWnd) {
+	Type& BaseFrame::GetInstance(const HWND hWnd) {
 		return *static_cast<Type*>(VariantInstance(hWnd));
 	}
 
 	class Main :
 		virtual Data,
-		public Frame
+		public BaseFrame
 	{
 	protected:
 		explicit Main();
@@ -53,15 +53,15 @@ namespace frame {
 		static LRESULT CALLBACK CallBackMain(HWND, UINT, WPARAM, LPARAM);
 	};
 
-	class Draw :
+	class Frame :
 		virtual Data,
-		public Frame
+		public BaseFrame
 	{
 	public:
 		virtual void LButtonDown(const LPARAM lParam) = 0;
 
 	protected:
-		explicit Draw(
+		explicit Frame(
 			const HWND hWnd,
 			const IDC IDC_FRAME
 		);

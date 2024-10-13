@@ -23,7 +23,8 @@ namespace domain {
 		sea,
 		sky,
 		ship,
-		blast
+		blast,
+		missle
 	};
 
 	static UINT GetRandUINT(const UINT max) {
@@ -72,7 +73,7 @@ namespace domain {
 		UINT GetScaleUINT() const;
 		UINT GetLevelUINT() const;
 	protected:
-		Data(const HINSTANCE hInstance_ = NULL);
+		explicit Data(const HINSTANCE hInstance_ = NULL);
 	private:
 		HINSTANCE hInstance;
 

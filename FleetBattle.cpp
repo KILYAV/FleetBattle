@@ -5,40 +5,6 @@
 using namespace domain;
 using namespace fleet_battle;
 
-Enemy::Enemy(const HWND hWnd) :
-	Draw{ hWnd, IDC::FRAMEENEMY }
-{
-	Draw::Fill(Cell::sky);
-	EnableWindow(Enemy::GetHWND(), false);
-};
-void Enemy::LButtonDown(const LPARAM lParam) {
-	auto point{ GetPoint(lParam) };
-	if (Cell::sky != Sky::GetCell(point)) {
-		return;
-	}
-	else if (Cell::sea == Sea::GetCell(point)) {
-		Sky::SetCell(point, Cell::sea);
-		Draw::SetCell(point, Cell::sea);
-		return;
-	}
-	else {
-		if (auto points = LevelDown(point); points)
-			DeadBlast(points.value());
-		HitBlast(point);
-		return;
-	}
-}
-Allies::Allies(const HWND hWnd) :
-	Draw{ hWnd, IDC::FRAMEALLIES }
-{
-	Draw::Fill(Cell::sea);
-};
-void Allies::LButtonDown(const LPARAM lParam) {
-	auto point{ GetPoint(lParam) };
-	if (auto check{ LevelUp(point) }; check) {
-		Draw::SetCell(point, check.value());
-	}
-}
 FleetBattle::FleetBattle(const HINSTANCE hInstance) :
 	Data{ hInstance },
 	Main{},
@@ -63,11 +29,6 @@ void FleetBattle::Random() {
 	Allies::Order();
 	Allies::Fill();
 }
-void Allies::Fill() const {
-	UINT size{ GetSizeUINT() };
-	for (UINT x = 0; x < size; ++x) {
-		for (UINT y = 0; y < size; ++y) {
-			Draw::SetCell(Point{ x, y }, Sea::GetCell(Point{ x,y }));
-		}
-	}
+void FleetBattle::ShotBack() {
+	Allies::EnemyShot();
 }

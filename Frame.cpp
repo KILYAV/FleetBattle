@@ -2,7 +2,7 @@
 
 using namespace frame;
 
-Frame::Frame(
+BaseFrame::BaseFrame(
 	const WNDPROC WndProc,
 	const HWND hWnd,
 	const IDC IDC_FRAME
@@ -38,7 +38,7 @@ Frame::Frame(
 	RegisterClassExW(&wcex);
 
 	if (hWnd) {
-		Frame::hWnd = CreateWindowW(
+		BaseFrame::hWnd = CreateWindowW(
 			szWindowClass,
 			nullptr,
 			WS_CHILD /* | WS_DISABLED */,
@@ -60,7 +60,7 @@ Frame::Frame(
 			szTitle,
 			MAX_LOADSTRING
 		);
-		Frame::hWnd = CreateWindowW(
+		BaseFrame::hWnd = CreateWindowW(
 			szWindowClass,
 			szTitle,
 			WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
@@ -76,14 +76,14 @@ Frame::Frame(
 	}
 	VariantInstance(std::pair{ GetHWND(), this});
 }
-Frame* Frame::VariantInstance(
+BaseFrame* BaseFrame::VariantInstance(
 	std::variant<const HWND,
-	std::pair<const HWND, Frame*>> variant
+	std::pair<const HWND, BaseFrame*>> variant
 ) {
-	static std::map<const HWND, Frame*> inst;
+	static std::map<const HWND, BaseFrame*> inst;
 
 	if (variant.index()) {
-		auto [hWnd, ptr] { std::get<std::pair<const HWND, Frame*>>(variant) };
+		auto [hWnd, ptr] { std::get<std::pair<const HWND, BaseFrame*>>(variant) };
 		inst.emplace(hWnd, ptr);
 		return ptr;
 	}
@@ -93,14 +93,14 @@ Frame* Frame::VariantInstance(
 			return iter->second;
 	}
 }
-const Point Frame::GetPoint(
+const Point BaseFrame::GetPoint(
 	const LPARAM lParam
 ) const {
 	return Point{ (static_cast<UINT>(lParam) & 0xffff) / GetScaleUINT(),
 		((static_cast<UINT>(lParam) >> 16) & 0xffff) / GetScaleUINT() };
 }
 Main::Main() :
-	Frame{ CallBackMain, NULL, IDC::FRAMEMAIN }
+	BaseFrame{ CallBackMain, NULL, IDC::FRAMEMAIN }
 {
 	RECT RWindows, RClient;
 	GetWindowRect(GetHWND(), &RWindows);
@@ -142,11 +142,11 @@ LRESULT CALLBACK Main::CallBackMain(
 	}
 	return 0;
 }
-Draw::Draw(
+Frame::Frame(
 	const HWND hWnd,
 	const IDC IDC_FRAME
 ) :
-	Frame{ CallBackDraw, hWnd, IDC_FRAME},
+	BaseFrame{ CallBackDraw, hWnd, IDC_FRAME},
 	hDC{ GetDC(GetHWND()) }
 {
 	UINT sizeFrame{ GetSizeUINT() * GetScaleUINT() };
@@ -159,12 +159,12 @@ Draw::Draw(
 
 	SelectCell(Cell::sea);
 }
-void Draw::SetCell(
+void Frame::SetCell(
 	const Point point, const Cell cell
 ) const {
-	if (Draw::type != cell) {
+	if (Frame::type != cell) {
 		SelectCell(cell);
-		Draw::type = cell;
+		Frame::type = cell;
 	}
 	auto scale{ GetScaleUINT() };
 	Rectangle(
@@ -175,7 +175,7 @@ void Draw::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
-void Draw::DeadBlast(
+void Frame::DeadBlast(
 	const std::tuple<Point, Point, Point, Point> points
 ) const {
 	enum Direct {
@@ -186,42 +186,42 @@ void Draw::DeadBlast(
 	};
 	UINT max = GetMaxUINT();
 	if (false == std::get<up>(points).IsNan(max)) {
-		Draw::SetCell(std::get<up>(points), Cell::sea);
+		Frame::SetCell(std::get<up>(points), Cell::missle);
 	}
 	if (false == std::get<down>(points).IsNan(max)) {
-		Draw::SetCell(std::get<down>(points), Cell::sea);
+		Frame::SetCell(std::get<down>(points), Cell::missle);
 	}
 	if (false == std::get<left>(points).IsNan(max)) {
-		Draw::SetCell(std::get<left>(points), Cell::sea);
+		Frame::SetCell(std::get<left>(points), Cell::missle);
 	}
 	if (false == std::get<right>(points).IsNan(max)) {
-		Draw::SetCell(std::get<right>(points), Cell::sea);
+		Frame::SetCell(std::get<right>(points), Cell::missle);
 	}
 }
-void Draw::HitBlast(
+void Frame::HitBlast(
 	const Point point
 ) const {
 	UINT max = GetMaxUINT();
 	if (false == point.Up().Left().IsNan(max)) {
-		Draw::SetCell(point.Up().Left(), Cell::sea);
+		Frame::SetCell(point.Up().Left(), Cell::missle);
 	}
 	if (false == point.Up().Right().IsNan(max)) {
-		Draw::SetCell(point.Up().Right(), Cell::sea);
+		Frame::SetCell(point.Up().Right(), Cell::missle);
 	}
 	if (false == point.Down().Left().IsNan(max)) {
-		Draw::SetCell(point.Down().Left(), Cell::sea);
+		Frame::SetCell(point.Down().Left(), Cell::missle);
 	}
 	if (false == point.Down().Right().IsNan(max)) {
-		Draw::SetCell(point.Down().Right(), Cell::sea);
+		Frame::SetCell(point.Down().Right(), Cell::missle);
 	}
-	Draw::SetCell(point, Cell::blast);
+	Frame::SetCell(point, Cell::blast);
 }
-void Draw::Fill(
+void Frame::Fill(
 	const Cell cell
 ) const {
-	if (Draw::type != cell) {
+	if (Frame::type != cell) {
 		SelectCell(cell);
-		Draw::type = cell;
+		Frame::type = cell;
 	}
 	auto size{ GetSizeUINT() };
 	auto scale{ GetScaleUINT() };
@@ -237,7 +237,7 @@ void Draw::Fill(
 		}
 	}
 }
-void Draw::SelectCell(
+void Frame::SelectCell(
 	const Cell cell
 ) const {
 	enum class Color {
@@ -258,6 +258,7 @@ void Draw::SelectCell(
 	static const Cell sky{ Color::White, Color::Blue };
 	static const Cell ship{ Color::Blace, Color::Blace };
 	static const Cell blast{ Color::Red, Color::Red };
+	static const Cell missle{ Color::Blue, Color::Red };
 
 	switch (static_cast<UINT>(cell)) {
 	case(static_cast<UINT>(domain::Cell::sea)):
@@ -272,12 +273,16 @@ void Draw::SelectCell(
 		SelectObject(hDC, ship.brush);
 		SelectObject(hDC, ship.pen);
 		break;
-	default:
+	case(static_cast<UINT>(domain::Cell::blast)):
 		SelectObject(hDC, blast.brush);
 		SelectObject(hDC, blast.pen);
+		break;
+	default:
+		SelectObject(hDC, missle.brush);
+		SelectObject(hDC, missle.pen);
 	}
 }
-LRESULT CALLBACK Draw::CallBackDraw(
+LRESULT CALLBACK Frame::CallBackDraw(
 	HWND hWnd,
 	UINT message,
 	WPARAM wParam,
@@ -286,7 +291,7 @@ LRESULT CALLBACK Draw::CallBackDraw(
 	switch (message)
 	{
 	case WM_LBUTTONDOWN:
-		GetInstance<Draw>(hWnd).LButtonDown(lParam);
+		GetInstance<Frame>(hWnd).LButtonDown(lParam);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
