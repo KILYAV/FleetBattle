@@ -17,7 +17,7 @@ namespace random {
 			const Level level
 		);
 
-		std::pair<Point, Direct> GetPointDirect(
+		std::pair<Point, Direct_t> GetPointDirect(
 			const Level level
 		) const;
 		UINT GetOffset(

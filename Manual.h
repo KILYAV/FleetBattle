@@ -31,7 +31,7 @@ namespace manual {
 		) const;
 		std::optional<Point> GetEndPoint(
 			const Point start,
-			const Direct direct
+			const Direct_t direct
 		) const;
 	};
 }

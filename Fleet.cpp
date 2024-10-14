@@ -118,9 +118,9 @@ void Enemy::LButtonDown(const LPARAM lParam) {
 		return;
 	}
 	else {
+		HitBlast(point);
 		if (auto points = LevelDown(point); points)
 			DeadBlast(points.value());
-		HitBlast(point);
 		return;
 	}
 }
@@ -150,9 +150,11 @@ void Allies::EnemyShot(
 		}
 		else if (Cell::ship == Sea::GetCell(random)) {
 			SetCell(random, Cell::blast);
-			if (auto points = LevelDown(random); points)
-				DeadBlast(points.value());
 			HitBlast(random);
+			if (auto points = LevelDown(random); points) {
+				DeadBlast(points.value());
+				return EnemyShot();
+			}
 			return EnemyShot(random);
 		}
 	}

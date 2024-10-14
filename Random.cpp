@@ -25,14 +25,14 @@ void Random::GetShip(const Level level) {
 		point = (&point->*direct)();
 	}
 }
-std::pair<Point, Random::Direct> Random::GetPointDirect(
+std::pair<Point, Random::Direct_t> Random::GetPointDirect(
 	const Level level
 ) const {
 	auto [center, up, left, ver, hor] {GetPointRaw(level)};
 
 	UINT deltaX = center.X();
 	UINT deltaY = center.Y();
-	Direct direct = nullptr;
+	Direct_t direct = nullptr;
 	if (hor < static_cast<UINT>(level)) {
 		deltaY = up + GetOffset(ver, level);
 		direct = &Point::Down;
@@ -96,13 +96,13 @@ std::tuple<UINT, UINT, UINT, UINT> Random::GetRaw(
 ) const {
 	using namespace compare;
 	UINT up = LengthRaw(
-		&Random::CompareTrip<Sea, HOR>, point, &Point::Up);
+		&Random::CompareHor, point, &Point::Up);
 	UINT left = LengthRaw(
-		&Random::CompareTrip<Sea, VER>, point, &Point::Left);
+		&Random::CompareVer, point, &Point::Left);
 	UINT ver = LengthRaw(
-		&Random::CompareTrip<Sea, HOR>, point, &Point::Down);
+		&Random::CompareHor, point, &Point::Down);
 	UINT hor = LengthRaw(
-		&Random::CompareTrip<Sea, VER>, point, &Point::Right);
+		&Random::CompareVer, point, &Point::Right);
 
 	ver = ver + up - 1;
 	hor = hor + left - 1;
@@ -115,6 +115,6 @@ Point Random::GetCenter() const {
 	Point point;
 	do {
 		point = Sea::GetRandPoint(Cell::sea);
-	} while (CompareSquare<Sea>(point));
+	} while (CompareSquare(point));
 	return point;
 }

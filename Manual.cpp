@@ -58,36 +58,26 @@ Manual::EndPoints Manual::LevelDown(const Point point) {
 std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 	const Point point
 ) const {
-	if (CompareCorner<Sea>(point)) {
+	if (CompareCorner(point)) {
 		return {};
 	}
 	UINT first{
-		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Up) +
-		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Left)
+		LengthRaw(&Manual::WrapperCell, point, &Point::Up) +
+		LengthRaw(&Manual::WrapperCell, point, &Point::Left)
 	};
 	UINT second{
-		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Down) +
-		LengthRaw(&Manual::CompareCell<Sea>, point, &Point::Right)
+		LengthRaw(&Manual::WrapperCell, point, &Point::Down) +
+		LengthRaw(&Manual::WrapperCell, point, &Point::Right)
 	};
 	if (Cell::ship == Sea::GetCell(point)) {
 		return { { first, second, false } };
 	}
 	else
 		return { { first, second, true } };
-	/*
-	if (Cell::sea == Sea::GetCell(point)) {
-		return { { first, second, true } };
-	}
-	else if (Cell::ship == Sea::GetCell(point)) {
-		return { { first, second, false } };
-	}
-	else
-		return {};
-		*/
 }
 std::optional<Point> Manual::GetEndPoint(
 	const Point start,
-	const Direct direct
+	const Direct_t direct
 ) const {
 	UINT max = GetMaxUINT();
 	Point point = (&start->*direct)();
