@@ -16,17 +16,22 @@ namespace shot {
 			const IDC IDC_FRAME
 		);
 
-		void HitCell(
-			const Point point,
-			const Cell cell
-		);
-		void HitCorner(
+		void Blast(
 			const Point point
 		);
-		void HitFace(
+		void Missle(
+			const Point point
+		);
+		void MissleCorner(
+			const Point point
+		);
+		void MissleFace(
 			const std::tuple<Point, Point, Point, Point>
 		);
 	private:
-
+		void SetCell(
+			const Point point,
+			const Cell
+		);
 	};
 }
