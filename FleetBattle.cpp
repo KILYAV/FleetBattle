@@ -10,7 +10,11 @@ FleetBattle::FleetBattle(const HINSTANCE hInstance) :
 	Main{},
 	Enemy{ Main::GetHWND() },
 	Allies{ Main::GetHWND() }
-{};
+{
+	Enemy::Frame::Fill();
+	Allies::Frame::Fill();
+	EnableWindow(Enemy::GetHWND(), false);
+};
 void FleetBattle::Battle() {
 	if (auto wstring_opt = Allies::Cancel(); wstring_opt) {
 		MessageBox(
@@ -27,8 +31,8 @@ void FleetBattle::Battle() {
 }
 void FleetBattle::Random() {
 	Allies::Order();
-	Allies::Fill();
+	Allies::Frame::Fill();
 }
-void FleetBattle::ShotBack() {
-	Allies::EnemyShot();
+void FleetBattle::ReturnedFire() {
+	Allies::Damage();
 }

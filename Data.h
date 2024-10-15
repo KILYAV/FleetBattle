@@ -26,6 +26,12 @@ namespace domain {
 		blast,
 		missle
 	};
+	enum Direct {
+		up,
+		down,
+		left,
+		right
+	};
 
 	static UINT GetRandUINT(const UINT max) {
 		return std::rand() / (RAND_MAX / max);
@@ -53,6 +59,14 @@ namespace domain {
 
 		bool IsNan() const;
 		bool IsNan(const UINT max) const;
+
+		bool IsNotNan() const;
+		bool IsNotNan(const UINT max) const;
+
+		Point& Up();
+		Point& Down();
+		Point& Left();
+		Point& Right();
 
 		Point Up() const;
 		Point Down() const;

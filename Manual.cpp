@@ -12,14 +12,7 @@ std::optional<Cell> Manual::LevelUp(
 			if (first + second >= GetLevelUINT())
 				return {};
 		}
-		auto& ranks{ Ranks() };
-		if (first) {
-			ranks[first - 1] += level ? -1 : +1;
-		}
-		if (second) {
-			ranks[second - 1] += level ? -1 : +1;
-		}
-		ranks[first + second] += level ? +1 : -1;
+		SetRanks(first, second, level);
 		if (level) {
 			Sea::SetCell(point, Cell::ship);
 			return { Cell::ship };
@@ -31,24 +24,14 @@ std::optional<Cell> Manual::LevelUp(
 	}
 	return {};
 }
-Manual::EndPoints Manual::LevelDown(const Point point) {
+Manual::OptionalPoints Manual::LevelDown(const Point point) {
 	auto [first, second, level] { CheckUp(point).value() };
-	auto& ranks{ Ranks() };
-	if (first) {
-		--ranks[first - 1];
-	}
-	if (second) {
-		--ranks[second - 1];
-	}
-	++ranks[first + second];
+	SetRanks(first, second, level);
 
-	Sea::SetCell(point, Cell::blast);
-	Sky::SetCell(point, Cell::blast);
-
-	std::optional<Point> up = GetEndPoint(point, &Point::Up);
-	std::optional<Point> down = GetEndPoint(point, &Point::Down);
-	std::optional<Point> left = GetEndPoint(point, &Point::Left);
-	std::optional<Point> right = GetEndPoint(point, &Point::Right);
+	std::optional<Point> up = GetEndPointRaw(&Point::Up, point);
+	std::optional<Point> down = GetEndPointRaw(&Point::Down, point);
+	std::optional<Point> left = GetEndPointRaw(&Point::Left, point);
+	std::optional<Point> right = GetEndPointRaw(&Point::Right, point);
 
 	if (up && down && left && right)
 		return std::tuple{ up.value(), down.value(), left.value(), right.value() };
@@ -62,12 +45,12 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 		return {};
 	}
 	UINT first{
-		LengthRaw(&Manual::WrapperCell, point, &Point::Up) +
-		LengthRaw(&Manual::WrapperCell, point, &Point::Left)
+		GetLengthRaw(&Manual::WrapperCell, &Point::Up, point) +
+		GetLengthRaw(&Manual::WrapperCell, &Point::Left, point)
 	};
 	UINT second{
-		LengthRaw(&Manual::WrapperCell, point, &Point::Down) +
-		LengthRaw(&Manual::WrapperCell, point, &Point::Right)
+		GetLengthRaw(&Manual::WrapperCell, &Point::Down, point) +
+		GetLengthRaw(&Manual::WrapperCell, &Point::Right, point)
 	};
 	if (Cell::ship == Sea::GetCell(point)) {
 		return { { first, second, false } };
@@ -75,15 +58,29 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 	else
 		return { { first, second, true } };
 }
-std::optional<Point> Manual::GetEndPoint(
-	const Point start,
-	const Direct_t direct
+std::optional<Point> Manual::GetEndPointRaw(
+	const Direct_t direct,
+	Point point
 ) const {
+	auto optional{ GetPointRaw(direct, point) };
+	if (optional) {
+		point = optional.value();
+		if (Cell::sky == Sky::GetCell(point)) {
+			if (Cell::sea == Sea::GetCell(point)) {
+				return optional;
+			}
+			else {
+				return Point{};
+			}
+		}
+	}
+	return { Point{} };
+	/*
 	UINT max = GetMaxUINT();
-	Point point = (&start->*direct)();
-	if (false == point.IsNan(max)) {
+	(&point->*direct)();
+	if (point.IsNotNan(max)) {
 		while (Cell::blast == Sky::GetCell(point)) {
-			point = (&point->*direct)();
+			(&point->*direct)();
 			if (point.IsNan(max)) {
 				return Point{};
 			}
@@ -97,4 +94,5 @@ std::optional<Point> Manual::GetEndPoint(
 
 	}
 	return Point{};
+	*/
 }

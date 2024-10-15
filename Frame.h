@@ -70,13 +70,14 @@ namespace frame {
 			const Point point,
 			const Cell cell
 		) const;
+		void Fill() const;
 
-		void Fill(
-			const Cell cell
-		) const;
+		virtual Cell GetCell(
+			const Point point
+		) const = 0;
 	private:
 		HDC hDC;
-		mutable Cell type = Cell::sea;
+		mutable Cell cell = Cell::sea;
 
 		void SelectCell(const Cell cell) const;
 

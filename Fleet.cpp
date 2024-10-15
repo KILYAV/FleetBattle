@@ -2,22 +2,12 @@
 
 using namespace fleet;
 
-std::vector<UINT>& Fleet::Ranks() {
-	return ranks;
-}
 Fleet::Fleet(
 	const HWND hWnd,
 	const IDC IDC_FRAME
 ) :
 	shot::Shot{ hWnd, IDC_FRAME }
 {
-	if (IDC::FRAMEALLIES == IDC_FRAME) {
-		Frame::Fill(Cell::sea);
-	}
-	else {
-		Frame::Fill(Cell::sky);
-		EnableWindow(GetHWND(), false);
-	}
 	ranks.resize(GetLevelUINT());
 }
 std::optional<std::pair<UINT, bool>> Fleet::Status() const {
@@ -46,22 +36,74 @@ std::optional<std::wstring> Fleet::Cancel() const {
 	else
 		return {};
 }
-void Enemy::LButtonDown(const LPARAM lParam) {
+void Fleet::Damage()
+{
+	if (target)
+		;
+	else
+		RandomHit();
+}
+bool Fleet::RandomHit() {
+	auto random = Sky::GetRandPoint(Cell::sky);
+	if (Cell::sea == Sea::GetCell(random)) {
+		Missle(random);
+		return false;
+	}
+	else {
+		MissleCorner(random);
+		Blast(random);
+		if (auto points = LevelDown(random); points) {
+			MissleFace(points.value());
+			return true;
+		}
+		else {
+			;
+		}
+	}
+}
+void Fleet::SetRanks(
+	const UINT first,
+	const UINT second,
+	const bool level
+) {
+	if (first) {
+		ranks[first - 1] += level ? -1 : +1;
+	}
+	if (second) {
+		ranks[second - 1] += level ? -1 : +1;
+	}
+	ranks[first + second] += level ? +1 : -1;
+}
+void Fleet::ReRanks() {
+	for (UINT index = 0, size = GetLevelUINT(), count = size;
+		index < size; ++index) {
+		ranks[index] = count--;
+	}
+}
+void Enemy::LButtonDown(
+	const LPARAM lParam
+) {
 	auto point = GetPoint(lParam);
 	if (Cell::sky != Sky::GetCell(point)) {
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
-		HitCell(point, Cell::missle);
-		ShotBack();
+		Missle(point);
+		ReturnedFire();
 		return;
 	}
 	else {
-		HitCorner(point);
+		Blast(point);
+		MissleCorner(point);
 		if (auto points = LevelDown(point); points)
-			HitFace(points.value());
+			MissleFace(points.value());
 		return;
 	}
+}
+Cell Enemy::GetCell(
+	const Point point
+) const {
+	return Sky::GetCell(point);
 }
 void Allies::LButtonDown(const LPARAM lParam) {
 	auto point{ GetPoint(lParam) };
@@ -69,6 +111,12 @@ void Allies::LButtonDown(const LPARAM lParam) {
 		Frame::SetCell(point, check.value());
 	}
 }
+Cell Allies::GetCell(
+	const Point point
+) const {
+	return Sea::GetCell(point);
+}
+/*
 void Allies::EnemyShot(
 	std::optional<Point> point
 ) {
@@ -84,25 +132,18 @@ void Allies::EnemyShot(
 	else {
 		auto random = Sky::GetRandPoint(Cell::sky);
 		if (Cell::sea == Sea::GetCell(random)) {
-			HitCell(random, Cell::missle);
+			Missle(random);
 			return;
 		}
 		else if (Cell::ship == Sea::GetCell(random)) {
-			HitCell(random, Cell::blast);
-			HitCorner(random);
+			Missle(random);
+			MissleCorner(random);
 			if (auto points = LevelDown(random); points) {
-				HitFace(points.value());
+				MissleFace(points.value());
 				return EnemyShot();
 			}
 			return EnemyShot(random);
 		}
 	}
 }
-void Allies::Fill() const {
-	UINT size{ GetSizeUINT() };
-	for (UINT x = 0; x < size; ++x) {
-		for (UINT y = 0; y < size; ++y) {
-			Frame::SetCell(Point{ x, y }, Sea::GetCell(Point{ x,y }));
-		}
-	}
-}
+*/

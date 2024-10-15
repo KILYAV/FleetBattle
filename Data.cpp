@@ -14,6 +14,40 @@ bool Point::IsNan() const {
 bool Point::IsNan(const UINT max) const {
 	return x > max || y > max;
 }
+bool Point::IsNotNan() const {
+	return false == IsNan();
+}
+bool Point::IsNotNan(const UINT max) const {
+	return false == IsNan(max);
+}
+Point& Point::Up() {
+	if (this->IsNan() || (y - 1 == -1))
+		x = -1, y = -1;
+	else 
+		y -= 1;
+	return *this;
+}
+Point& Point::Down() {
+	if (this->IsNan() || (y + 1 == -1))
+		x = -1, y = -1;
+	else
+		y += 1;
+	return *this;
+}
+Point& Point::Left() {
+	if (this->IsNan() || (x - 1 == -1))
+		x = -1, y = -1;
+	else
+		x -= 1;
+	return *this;
+}
+Point& Point::Right() {
+	if (this->IsNan() || (x + 1 == -1))
+		x = -1, y = -1;
+	else
+		x += 1;
+	return *this;
+}
 Point Point::Up() const {
 	if (this->IsNan() || (y - 1 == -1))
 		return Point{};

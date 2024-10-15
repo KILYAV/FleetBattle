@@ -10,7 +10,7 @@ namespace fleet_battle {
 	class FleetBattle :
 		virtual domain::Data,
 		frame::Main,
-		fleet::Enemy,
+		protected fleet::Enemy,
 		fleet::Allies
 	{
 	public:
@@ -18,7 +18,6 @@ namespace fleet_battle {
 	private:
 		void Battle() override;
 		void Random() override;
-
-		void ShotBack() override;
+		void ReturnedFire() override;
 	};
 }

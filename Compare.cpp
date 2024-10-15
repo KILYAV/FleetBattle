@@ -12,7 +12,7 @@ bool OR(const std::optional<bool>* optional, const UINT size) {
 std::optional<bool> Compare::CompareCell(
 	const Point point
 ) const {
-	if (false == point.IsNan(GetMaxUINT())) {
+	if (point.IsNotNan(GetMaxUINT())) {
 		if (Cell::ship == Sea::GetCell(point)) {
 			return true;
 		}
@@ -92,14 +92,37 @@ bool Compare::CompareSquare(
 	return
 		CompareCorner(point) || CompareFace(point);
 }
-UINT Compare::LengthRaw(
+UINT Compare::GetLengthRaw(
 	const Compare_t compare_f,
-	const Point start,
-	const Direct_t direct_f
+	const Direct_t direct_f,
+	Point point
 ) const {
-	Point point = (&start->*direct_f)();
-	if (false == point.IsNan(GetMaxUINT()))
-		if ((this->*compare_f)(point))
-			return LengthRaw(compare_f, point, direct_f) + 1;
-	return 0;
+	UINT max = GetMaxUINT();
+	UINT count{ 0 };
+	(&point->*direct_f)();
+	if (point.IsNotNan(max))
+		while ((this->*compare_f)(point)) {
+			++count;
+			(&point->*direct_f)();
+			if (point.IsNan(max))
+				return count;
+		}
+	return count;
+}
+std::optional<Point> Compare::GetPointRaw(
+	const Direct_t direct_f,
+	Point point
+) const {
+	UINT max = GetMaxUINT();
+	(&point->*direct_f)();
+	if (point.IsNotNan(max)) {
+		while (Cell::blast == Sky::GetCell(point)) {
+			(&point->*direct_f)();
+			if (point.IsNan(max)) {
+				return Point{};
+			}
+		}
+		return point;
+	}
+	return {};
 }

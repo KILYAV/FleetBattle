@@ -34,11 +34,15 @@ namespace compare {
 		) const;
 
 		using Compare_t = bool (Compare::*)(const Point) const;
-		using Direct_t = Point (Point::*)() const;
-		UINT LengthRaw(
+		using Direct_t = Point& (Point::*)();
+		UINT GetLengthRaw(
 			const Compare_t compare_f,
-			const Point start,
-			const Direct_t direct_f
+			const Direct_t direct_f,
+			Point point
+		) const;
+		std::optional<Point> GetPointRaw(
+			const Direct_t direct_f,
+			Point point
 		) const;
 	};
 }
