@@ -17,9 +17,27 @@ namespace fleet {
 		std::optional<std::pair<UINT, bool>> Status() const;
 		std::optional<std::wstring> Cancel() const;
 
+		void Damage();
 	private:
-		std::vector<UINT>& Ranks() override;
+		bool RandomHit();
 
+		void SetRanks (
+			const UINT first,
+			const UINT second,
+			const bool level
+		) override;
+		const std::vector<UINT>& GetRanks() const override {
+			return ranks;
+		}
+		void ReRanks() override;
+
+		using Target_t = std::optional<std::tuple<
+			std::optional<Point>,
+			std::optional<Point>,
+			std::optional<Point>,
+			std::optional<Point>>>;
+
+		Target_t target{};
 		std::vector<UINT> ranks;
 	};
 
@@ -33,7 +51,12 @@ namespace fleet {
 		{};
 
 		void LButtonDown(const LPARAM lParam) override;
-		virtual void ShotBack() = 0;
+
+		virtual void ReturnedFire() = 0;
+	private:
+		Cell GetCell(
+			const Point point
+		) const override;
 	};
 	class Allies :
 		virtual Data,
@@ -45,10 +68,10 @@ namespace fleet {
 		{};
 
 		void LButtonDown(const LPARAM lParam) override;
-		void EnemyShot(
-			std::optional<Point> point = {}
-		);
-		void Fill() const;
+	private:
+		Cell GetCell(
+			const Point point
+		) const override;
 	};
 
 }

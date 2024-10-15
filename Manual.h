@@ -18,20 +18,24 @@ namespace manual {
 		Manual() = default;
 		std::optional<Cell> LevelUp(const Point point);
 
-		using EndPoints =
+		using OptionalPoints =
 			std::optional<std::tuple<Point, Point, Point, Point>>;
-		EndPoints LevelDown(
+		OptionalPoints LevelDown(
 			const Point point
 		);
 
-		virtual std::vector<UINT>& Ranks() = 0;
+		virtual void SetRanks(
+			const UINT first,
+			const UINT second,
+			const bool level
+		) = 0;
 	private:
 		std::optional<std::tuple<UINT, UINT, bool>> CheckUp(
 			const Point point
 		) const;
-		std::optional<Point> GetEndPoint(
-			const Point start,
-			const Direct_t direct
+		std::optional<Point> GetEndPointRaw(
+			const Direct_t direct,
+			Point point
 		) const;
 	};
 }

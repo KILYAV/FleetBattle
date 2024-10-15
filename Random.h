@@ -31,5 +31,8 @@ namespace random {
 			const Point center
 		) const;
 		Point GetCenter() const;
+
+		virtual void ReRanks() = 0;
+		virtual const std::vector<UINT>& GetRanks() const = 0;
 	};
 }

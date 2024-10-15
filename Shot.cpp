@@ -2,20 +2,13 @@
 
 using namespace shot;
 
-enum Direct {
-	up,
-	down,
-	left,
-	right
-};
-
 Shot::Shot(
 	const HWND hWnd,
 	const IDC IDC_FRAME
 ) :
 	Frame{ hWnd, IDC_FRAME }
 {};
-void Shot::HitCell(
+void Shot::SetCell(
 	const Point point,
 	const Cell cell
 ) {
@@ -23,38 +16,43 @@ void Shot::HitCell(
 	Sea::SetCell(point, cell);
 	Frame::SetCell(point, cell);
 }
-void Shot::HitCorner(
+void Shot::Blast(
+	const Point point
+) {
+	SetCell(point, Cell::blast);
+}
+void Shot::Missle(
+	const Point point
+) {
+	SetCell(point, Cell::missle);
+}
+void Shot::MissleCorner(
 	const Point point
 ) {
 	UINT max = GetMaxUINT();
-	if (false == point.Up().Left().IsNan(max)) {
-		HitCell(point.Up().Left(), Cell::missle);
-	}
-	if (false == point.Up().Right().IsNan(max)) {
-		HitCell(point.Up().Right(), Cell::missle);
-	}
-	if (false == point.Down().Left().IsNan(max)) {
-		HitCell(point.Down().Left(), Cell::missle);
-	}
-	if (false == point.Down().Right().IsNan(max)) {
-		HitCell(point.Down().Right(), Cell::missle);
-	}
-	Frame::SetCell(point, Cell::blast);
+	if (Point next{ point.Up().Left() }; next.IsNotNan(max))
+		Missle(next);
+	if (Point next{ point.Up().Right() }; next.IsNotNan(max))
+		Missle(next);
+	if (Point next{ point.Down().Left() }; next.IsNotNan(max))
+		Missle(next);
+	if (Point next{ point.Down().Right() }; next.IsNotNan(max))
+		Missle(next);
 }
-void Shot::HitFace(
+void Shot::MissleFace(
 	const std::tuple<Point, Point, Point, Point> points
 ) {
 	UINT max = GetMaxUINT();
-	if (false == std::get<up>(points).IsNan(max)) {
-		HitCell(std::get<up>(points), Cell::missle);
+	if (std::get<up>(points).IsNotNan(max)) {
+		Missle(std::get<up>(points));
 	}
-	if (false == std::get<down>(points).IsNan(max)) {
-		HitCell(std::get<down>(points), Cell::missle);
+	if (std::get<down>(points).IsNotNan(max)) {
+		Missle(std::get<down>(points));
 	}
-	if (false == std::get<left>(points).IsNan(max)) {
-		HitCell(std::get<left>(points), Cell::missle);
+	if (std::get<left>(points).IsNotNan(max)) {
+		Missle(std::get<left>(points));
 	}
-	if (false == std::get<right>(points).IsNan(max)) {
-		HitCell(std::get<right>(points), Cell::missle);
+	if (std::get<right>(points).IsNotNan(max)) {
+		Missle(std::get<right>(points));
 	}
 }

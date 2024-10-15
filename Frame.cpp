@@ -162,9 +162,9 @@ Frame::Frame(
 void Frame::SetCell(
 	const Point point, const Cell cell
 ) const {
-	if (Frame::type != cell) {
+	if (Frame::cell != cell) {
 		SelectCell(cell);
-		Frame::type = cell;
+		Frame::cell = cell;
 	}
 	auto scale{ GetScaleUINT() };
 	Rectangle(
@@ -175,17 +175,16 @@ void Frame::SetCell(
 		(point.Y() + 1) * scale
 	);
 }
-void Frame::Fill(
-	const Cell cell
-) const {
-	if (Frame::type != cell) {
-		SelectCell(cell);
-		Frame::type = cell;
-	}
+void Frame::Fill() const
+{
 	auto size{ GetSizeUINT() };
 	auto scale{ GetScaleUINT() };
 	for (UINT x = 0; x < size; ++x) {
 		for (UINT y = 0; y < size; ++y) {
+			if (auto cell{ GetCell(Point{ x,y }) }; Frame::cell != cell) {
+				SelectCell(cell);
+				Frame::cell = cell;
+			}
 			Rectangle(
 				hDC,
 				x * scale,

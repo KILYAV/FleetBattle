@@ -4,13 +4,9 @@ using namespace random;
 
 void Random::Order() {
 	Sea::Fill(Cell::sea);
-	auto& ranks{ Ranks() };
+	ReRanks();
 
-	for (UINT index = 0, size = GetLevelUINT(), count = size;
-		index < size; ++index) {
-		ranks[index] = count--;
-	}
-
+	auto ranks = GetRanks();
 	for (UINT level = ranks.size(); level > 0; --level) {
 		for (UINT number = 0, count = ranks[level - 1]; number < count; ++number) {
 			GetShip(static_cast<Level>(level));
@@ -22,7 +18,7 @@ void Random::GetShip(const Level level) {
 	for (UINT index = 0, size = static_cast<UINT>(level);
 		index < size; ++index) {
 		Sea::SetCell(point, Cell::ship);
-		point = (&point->*direct)();
+		(&point->*direct)();
 	}
 }
 std::pair<Point, Random::Direct_t> Random::GetPointDirect(
@@ -95,14 +91,14 @@ std::tuple<UINT, UINT, UINT, UINT> Random::GetRaw(
 	const Point point
 ) const {
 	using namespace compare;
-	UINT up = LengthRaw(
-		&Random::CompareHor, point, &Point::Up);
-	UINT left = LengthRaw(
-		&Random::CompareVer, point, &Point::Left);
-	UINT ver = LengthRaw(
-		&Random::CompareHor, point, &Point::Down);
-	UINT hor = LengthRaw(
-		&Random::CompareVer, point, &Point::Right);
+	UINT up = GetLengthRaw(
+		&Random::CompareHor, &Point::Up, point);
+	UINT left = GetLengthRaw(
+		&Random::CompareVer, &Point::Left, point);
+	UINT ver = GetLengthRaw(
+		&Random::CompareHor, &Point::Down, point);
+	UINT hor = GetLengthRaw(
+		&Random::CompareVer, &Point::Right, point);
 
 	ver = ver + up - 1;
 	hor = hor + left - 1;
