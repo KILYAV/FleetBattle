@@ -139,6 +139,7 @@
     <ClInclude Include="Manual.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Shot.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +152,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Manual.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="Shot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FleetBattle.rc" />

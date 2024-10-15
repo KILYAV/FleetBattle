@@ -1,6 +1,5 @@
 #pragma once
-#include "Random.h"
-#include "Frame.h"
+#include "Shot.h"
 
 #include <string>
 #include <optional>
@@ -10,8 +9,7 @@ namespace fleet {
 
 	class Fleet :
 		virtual Data,
-		protected random::Random,
-		protected frame::Frame
+		protected shot::Shot
 	{
 	protected:
 		Fleet(const HWND hWnd, const IDC IDC_FRAME);
@@ -19,18 +17,7 @@ namespace fleet {
 		std::optional<std::pair<UINT, bool>> Status() const;
 		std::optional<std::wstring> Cancel() const;
 
-		void SetCell(
-			const Point point,
-			const Cell cell
-		);
-		void HitBlast(
-			const Point point
-		);
-		void DeadBlast(
-			const std::tuple<Point, Point, Point, Point>
-		);
 	private:
-
 		std::vector<UINT>& Ranks() override;
 
 		std::vector<UINT> ranks;

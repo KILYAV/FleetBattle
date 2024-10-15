@@ -2,26 +2,14 @@
 
 using namespace fleet;
 
-struct OR {
-	static bool Operator(bool lft, bool rht) {
-		return lft || rht;
-	}
-};
-struct AND {
-	static bool Operator(bool lft, bool rht) {
-		return lft && rht;
-	}
-};
-
 std::vector<UINT>& Fleet::Ranks() {
 	return ranks;
 }
-
 Fleet::Fleet(
 	const HWND hWnd,
 	const IDC IDC_FRAME
 ) :
-	frame::Frame{ hWnd, IDC_FRAME }
+	shot::Shot{ hWnd, IDC_FRAME }
 {
 	if (IDC::FRAMEALLIES == IDC_FRAME) {
 		Frame::Fill(Cell::sea);
@@ -58,69 +46,20 @@ std::optional<std::wstring> Fleet::Cancel() const {
 	else
 		return {};
 }
-void Fleet::SetCell(
-	const Point point,
-	const Cell cell
-) {
-	Sky::SetCell(point, cell);
-	Sea::SetCell(point, cell);
-	Frame::SetCell(point, cell);
-}
-void Fleet::HitBlast(
-	const Point point
-) {
-	UINT max = GetMaxUINT();
-	if (false == point.Up().Left().IsNan(max)) {
-		SetCell(point.Up().Left(), Cell::missle);
-	}
-	if (false == point.Up().Right().IsNan(max)) {
-		SetCell(point.Up().Right(), Cell::missle);
-	}
-	if (false == point.Down().Left().IsNan(max)) {
-		SetCell(point.Down().Left(), Cell::missle);
-	}
-	if (false == point.Down().Right().IsNan(max)) {
-		SetCell(point.Down().Right(), Cell::missle);
-	}
-	Frame::SetCell(point, Cell::blast);
-}
-void Fleet::DeadBlast(
-	const std::tuple<Point, Point, Point, Point> points
-) {
-	enum Direct {
-		up,
-		down,
-		left,
-		right
-	};
-	UINT max = GetMaxUINT();
-	if (false == std::get<up>(points).IsNan(max)) {
-		SetCell(std::get<up>(points), Cell::missle);
-	}
-	if (false == std::get<down>(points).IsNan(max)) {
-		SetCell(std::get<down>(points), Cell::missle);
-	}
-	if (false == std::get<left>(points).IsNan(max)) {
-		SetCell(std::get<left>(points), Cell::missle);
-	}
-	if (false == std::get<right>(points).IsNan(max)) {
-		SetCell(std::get<right>(points), Cell::missle);
-	}
-}
 void Enemy::LButtonDown(const LPARAM lParam) {
 	auto point = GetPoint(lParam);
 	if (Cell::sky != Sky::GetCell(point)) {
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
-		SetCell(point, Cell::missle);
+		HitCell(point, Cell::missle);
 		ShotBack();
 		return;
 	}
 	else {
-		HitBlast(point);
+		HitCorner(point);
 		if (auto points = LevelDown(point); points)
-			DeadBlast(points.value());
+			HitFace(points.value());
 		return;
 	}
 }
@@ -145,14 +84,14 @@ void Allies::EnemyShot(
 	else {
 		auto random = Sky::GetRandPoint(Cell::sky);
 		if (Cell::sea == Sea::GetCell(random)) {
-			SetCell(random, Cell::missle);
+			HitCell(random, Cell::missle);
 			return;
 		}
 		else if (Cell::ship == Sea::GetCell(random)) {
-			SetCell(random, Cell::blast);
-			HitBlast(random);
+			HitCell(random, Cell::blast);
+			HitCorner(random);
 			if (auto points = LevelDown(random); points) {
-				DeadBlast(points.value());
+				HitFace(points.value());
 				return EnemyShot();
 			}
 			return EnemyShot(random);
