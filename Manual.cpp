@@ -99,23 +99,7 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 bool Manual::WrapperCell(
 	const Point point
 ) const {
-<<<<<<< HEAD
 	auto optional = CompareCell(point);
 	return
 		optional ? optional.value() : false;
-=======
-	auto optional{ GetPointRaw(direct, point) };
-	if (optional) {
-		point = optional.value();
-		if (Cell::sky == Sky::GetCell(point)) {
-			if (Cell::sea == Sea::GetCell(point)) {
-				return optional;
-			}
-			else {
-				return Point{};
-			}
-		}
-	}
-	return Point{};
->>>>>>> refs/remotes/origin/master
 }
