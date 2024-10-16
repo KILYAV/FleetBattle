@@ -3,6 +3,8 @@
 #include "Random.h"
 #include "Frame.h"
 
+#include <array>
+
 namespace shot {
 	using namespace domain;
 	class Shot :
@@ -16,18 +18,27 @@ namespace shot {
 			const IDC IDC_FRAME
 		);
 
-		void Blast(
+		void BlastCell(
 			const Point point
 		);
-		void Missle(
+		void MissedCell(
 			const Point point
 		);
-		void MissleCorner(
+		void MisledCorner(
 			const Point point
 		);
-		void MissleFace(
-			const std::tuple<Point, Point, Point, Point>
+		void MisledFace(
+			const Target_t& target
 		);
+		bool IsTarget(
+			const Target_t& target
+		) const;
+		bool IsNotTarget(
+			const Target_t& target
+		) const {
+			return false == IsTarget(target);
+		}
+
 	private:
 		void SetCell(
 			const Point point,

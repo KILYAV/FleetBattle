@@ -31,20 +31,20 @@ std::pair<Point, Random::Direct_t> Random::GetPointDirect(
 	Direct_t direct = nullptr;
 	if (hor < static_cast<UINT>(level)) {
 		deltaY = up + GetOffset(ver, level);
-		direct = &Point::Down;
+		direct = &Point::South;
 	}
 	else if (ver < static_cast<UINT>(level)) {
 		deltaX = left + GetOffset(hor, level);
-		direct = &Point::Right;
+		direct = &Point::East;
 	}
 	else {
 		if (GetRandBool()) {
 			deltaY = up + GetOffset(ver, level);
-			direct = &Point::Down;
+			direct = &Point::South;
 		}
 		else {
 			deltaX = left + GetOffset(hor, level);
-			direct = &Point::Right;
+			direct = &Point::East;
 		}
 	}
 
@@ -61,15 +61,14 @@ UINT Random::GetOffset(
 	delta = GetRandUINT(delta + 1);
 	return delta;
 }
-enum Direct {
-	up,
-	left,
-	ver,
-	hor
-};
 std::tuple<Point, UINT, UINT, UINT, UINT> Random::GetPointRaw(
 	const Level level
 ) const {
+	constexpr UINT up = 0;
+	constexpr UINT left = 1;
+	constexpr UINT ver = 2;
+	constexpr UINT hor = 3;
+
 	Point center;
 	std::tuple<UINT, UINT, UINT, UINT> tuple;
 	do {
@@ -92,13 +91,13 @@ std::tuple<UINT, UINT, UINT, UINT> Random::GetRaw(
 ) const {
 	using namespace compare;
 	UINT up = GetLengthRaw(
-		&Random::CompareHor, &Point::Up, point);
+		&Random::CompareHor, &Point::North, point);
 	UINT left = GetLengthRaw(
-		&Random::CompareVer, &Point::Left, point);
+		&Random::CompareVer, &Point::West, point);
 	UINT ver = GetLengthRaw(
-		&Random::CompareHor, &Point::Down, point);
+		&Random::CompareHor, &Point::South, point);
 	UINT hor = GetLengthRaw(
-		&Random::CompareVer, &Point::Right, point);
+		&Random::CompareVer, &Point::East, point);
 
 	ver = ver + up - 1;
 	hor = hor + left - 1;

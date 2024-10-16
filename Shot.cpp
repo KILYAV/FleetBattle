@@ -16,43 +16,42 @@ void Shot::SetCell(
 	Sea::SetCell(point, cell);
 	Frame::SetCell(point, cell);
 }
-void Shot::Blast(
+void Shot::BlastCell(
 	const Point point
 ) {
 	SetCell(point, Cell::blast);
 }
-void Shot::Missle(
+void Shot::MissedCell(
 	const Point point
 ) {
 	SetCell(point, Cell::missle);
 }
-void Shot::MissleCorner(
+void Shot::MisledCorner(
 	const Point point
 ) {
 	UINT max = GetMaxUINT();
-	if (Point next{ point.Up().Left() }; next.IsNotNan(max))
-		Missle(next);
-	if (Point next{ point.Up().Right() }; next.IsNotNan(max))
-		Missle(next);
-	if (Point next{ point.Down().Left() }; next.IsNotNan(max))
-		Missle(next);
-	if (Point next{ point.Down().Right() }; next.IsNotNan(max))
-		Missle(next);
+	if (Point next{ point.North().West() }; next.IsNotNan(max))
+		MissedCell(next);
+	if (Point next{ point.North().East() }; next.IsNotNan(max))
+		MissedCell(next);
+	if (Point next{ point.South().West() }; next.IsNotNan(max))
+		MissedCell(next);
+	if (Point next{ point.South().East() }; next.IsNotNan(max))
+		MissedCell(next);
 }
-void Shot::MissleFace(
-	const std::tuple<Point, Point, Point, Point> points
+void Shot::MisledFace(
+	const Target_t& target
 ) {
-	UINT max = GetMaxUINT();
-	if (std::get<up>(points).IsNotNan(max)) {
-		Missle(std::get<up>(points));
+	for (UINT index = 0, size = target.count; index < size; ++index) {
+		MissedCell(target.points[index]);
 	}
-	if (std::get<down>(points).IsNotNan(max)) {
-		Missle(std::get<down>(points));
+}
+bool Shot::IsTarget(
+	const Target_t& target
+) const {
+	bool result = Cell::ship == Sea::GetCell(target.points[0]);
+	for (UINT index = 1, size = target.count; index < size; ++index) {
+		result = result || Cell::ship == Sea::GetCell(target.points[index]);
 	}
-	if (std::get<left>(points).IsNotNan(max)) {
-		Missle(std::get<left>(points));
-	}
-	if (std::get<right>(points).IsNotNan(max)) {
-		Missle(std::get<right>(points));
-	}
+	return result;
 }

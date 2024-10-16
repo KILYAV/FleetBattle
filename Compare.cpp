@@ -21,21 +21,14 @@ std::optional<bool> Compare::CompareCell(
 	}
 	return {};
 }
-bool Compare::WrapperCell(
-	const Point point
-) const {
-	auto optional = CompareCell(point);
-	return
-		optional ? optional.value() : false;
-}
 bool Compare::CompareCorner(
 	const Point point
 ) const {
 	std::optional<bool> optional[]{
-		CompareCell(point.Up().Left()),
-		CompareCell(point.Up().Right()),
-		CompareCell(point.Down().Left()),
-		CompareCell(point.Down().Right())
+		CompareCell(point.North().West()),
+		CompareCell(point.North().East()),
+		CompareCell(point.South().West()),
+		CompareCell(point.South().East())
 	};
 	return
 		OR(optional, std::size(optional));
@@ -44,10 +37,10 @@ bool Compare::CompareFace(
 	const Point point
 ) const {
 	std::optional<bool> optional[]{
-		CompareCell(point.Up()),
-		CompareCell(point.Down()),
-		CompareCell(point.Left()),
-		CompareCell(point.Right()),
+		CompareCell(point.North()),
+		CompareCell(point.South()),
+		CompareCell(point.West()),
+		CompareCell(point.East()),
 	};
 	return
 		OR(optional, std::size(optional));
@@ -56,9 +49,9 @@ bool Compare::CompareHor(
 	const Point point
 ) const {
 	std::optional<bool> optional[]{
-		CompareCell(point.Left()),
+		CompareCell(point.West()),
 		CompareCell(point),
-		CompareCell(point.Right())
+		CompareCell(point.East())
 	};
 
 	bool result{
@@ -73,9 +66,9 @@ bool Compare::CompareVer(
 	const Point point
 ) const {
 	std::optional<bool> optional[]{
-		CompareCell(point.Up()),
+		CompareCell(point.North()),
 		CompareCell(point),
-		CompareCell(point.Down())
+		CompareCell(point.South())
 	};
 
 	bool result{
@@ -91,38 +84,4 @@ bool Compare::CompareSquare(
 ) const {
 	return
 		CompareCorner(point) || CompareFace(point);
-}
-UINT Compare::GetLengthRaw(
-	const Compare_t compare_f,
-	const Direct_t direct_f,
-	Point point
-) const {
-	UINT max = GetMaxUINT();
-	UINT count{ 0 };
-	(&point->*direct_f)();
-	if (point.IsNotNan(max))
-		while ((this->*compare_f)(point)) {
-			++count;
-			(&point->*direct_f)();
-			if (point.IsNan(max))
-				return count;
-		}
-	return count;
-}
-std::optional<Point> Compare::GetPointRaw(
-	const Direct_t direct_f,
-	Point point
-) const {
-	UINT max = GetMaxUINT();
-	(&point->*direct_f)();
-	if (point.IsNotNan(max)) {
-		while (Cell::blast == Sky::GetCell(point)) {
-			(&point->*direct_f)();
-			if (point.IsNan(max)) {
-				return Point{};
-			}
-		}
-		return point;
-	}
-	return {};
 }

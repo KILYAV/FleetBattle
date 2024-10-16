@@ -16,7 +16,7 @@ FleetBattle::FleetBattle(const HINSTANCE hInstance) :
 	EnableWindow(Enemy::GetHWND(), false);
 };
 void FleetBattle::Battle() {
-	if (auto wstring_opt = Allies::Cancel(); wstring_opt) {
+	if (auto wstring_opt = Allies::IsCancel(); wstring_opt) {
 		MessageBox(
 			Main::GetHWND(),
 			wstring_opt.value().data(),

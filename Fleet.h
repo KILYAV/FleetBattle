@@ -15,11 +15,12 @@ namespace fleet {
 		Fleet(const HWND hWnd, const IDC IDC_FRAME);
 
 		std::optional<std::pair<UINT, bool>> Status() const;
-		std::optional<std::wstring> Cancel() const;
+		std::optional<std::wstring> IsCancel() const;
 
 		void Damage();
 	private:
-		bool RandomHit();
+		bool SeriosHit();
+		bool RandomHit(Point point = Point{});
 
 		void SetRanks (
 			const UINT first,
@@ -31,14 +32,8 @@ namespace fleet {
 		}
 		void ReRanks() override;
 
-		using Target_t = std::optional<std::tuple<
-			std::optional<Point>,
-			std::optional<Point>,
-			std::optional<Point>,
-			std::optional<Point>>>;
-
-		Target_t target{};
 		std::vector<UINT> ranks;
+		Target_t target;
 	};
 
 	class Enemy :

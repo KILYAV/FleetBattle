@@ -20,53 +20,53 @@ bool Point::IsNotNan() const {
 bool Point::IsNotNan(const UINT max) const {
 	return false == IsNan(max);
 }
-Point& Point::Up() {
+Point& Point::North() {
 	if (this->IsNan() || (y - 1 == -1))
 		x = -1, y = -1;
 	else 
 		y -= 1;
 	return *this;
 }
-Point& Point::Down() {
+Point& Point::South() {
 	if (this->IsNan() || (y + 1 == -1))
 		x = -1, y = -1;
 	else
 		y += 1;
 	return *this;
 }
-Point& Point::Left() {
+Point& Point::West() {
 	if (this->IsNan() || (x - 1 == -1))
 		x = -1, y = -1;
 	else
 		x -= 1;
 	return *this;
 }
-Point& Point::Right() {
+Point& Point::East() {
 	if (this->IsNan() || (x + 1 == -1))
 		x = -1, y = -1;
 	else
 		x += 1;
 	return *this;
 }
-Point Point::Up() const {
+Point Point::North() const {
 	if (this->IsNan() || (y - 1 == -1))
 		return Point{};
 	else
 		return Point{ x, y - 1 };
 }
-Point Point::Down() const {
+Point Point::South() const {
 	if (this->IsNan() || (y + 1 == -1))
 		return Point{};
 	else
 		return Point{ x, y + 1 };
 }
-Point Point::Left() const {
+Point Point::West() const {
 	if (this->IsNan() || (x - 1 == -1))
 		return Point{};
 	else
 		return Point{ x - 1, y };
 }
-Point Point::Right() const {
+Point Point::East() const {
 	if (this->IsNan() || (x + 1 == -1))
 		return Point{};
 	else

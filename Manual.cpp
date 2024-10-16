@@ -24,18 +24,56 @@ std::optional<Cell> Manual::LevelUp(
 	}
 	return {};
 }
-Manual::OptionalPoints Manual::LevelDown(const Point point) {
+Manual::Target_t Manual::LevelDown(const Point point) {
 	auto [first, second, level] { CheckUp(point).value() };
 	SetRanks(first, second, level);
+	
+	UINT count{ 0 };
+	std::array<Point, ends_points_size> result;
+	if (auto optional{ GetPointRaw(&Point::North, point) }; optional)
+		result[count++] = optional.value();
+	if (auto optional{ GetPointRaw(&Point::South, point) }; optional)
+		result[count++] = optional.value();
+	if (auto optional{ GetPointRaw(&Point::West, point) }; optional)
+		result[count++] = optional.value();
+	if (auto optional{ GetPointRaw(&Point::East, point) }; optional)
+		result[count++] = optional.value();
 
-	std::optional<Point> up = GetEndPointRaw(&Point::Up, point);
-	std::optional<Point> down = GetEndPointRaw(&Point::Down, point);
-	std::optional<Point> left = GetEndPointRaw(&Point::Left, point);
-	std::optional<Point> right = GetEndPointRaw(&Point::Right, point);
-
-	if (up && down && left && right)
-		return std::tuple{ up.value(), down.value(), left.value(), right.value() };
-
+	return { result, count };
+}
+UINT Manual::GetLengthRaw(
+	const Compare_t compare_f,
+	const Direct_t direct_f,
+	Point point
+) const {
+	UINT max = GetMaxUINT();
+	UINT count{ 0 };
+	(&point->*direct_f)();
+	for (; point.IsNotNan(max); ++count) {
+		if ((this->*compare_f)(point))
+			(&point->*direct_f)();
+		else
+			return count;
+	}
+	return count;
+}
+std::optional<Point> Manual::GetPointRaw(
+	const Direct_t direct_f,
+	Point point
+) const {
+	UINT max = GetMaxUINT();
+	(&point->*direct_f)();
+	while (point.IsNotNan(max)) {
+		switch (Sky::GetCell(point)) {
+		case(Cell::blast):
+			(&point->*direct_f)();
+			break;
+		case(Cell::sky):
+			return point;
+		default:
+			return {};
+		}
+	}
 	return {};
 }
 std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
@@ -45,12 +83,12 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 		return {};
 	}
 	UINT first{
-		GetLengthRaw(&Manual::WrapperCell, &Point::Up, point) +
-		GetLengthRaw(&Manual::WrapperCell, &Point::Left, point)
+		GetLengthRaw(&Manual::WrapperCell, &Point::North, point) +
+		GetLengthRaw(&Manual::WrapperCell, &Point::West, point)
 	};
 	UINT second{
-		GetLengthRaw(&Manual::WrapperCell, &Point::Down, point) +
-		GetLengthRaw(&Manual::WrapperCell, &Point::Right, point)
+		GetLengthRaw(&Manual::WrapperCell, &Point::South, point) +
+		GetLengthRaw(&Manual::WrapperCell, &Point::East, point)
 	};
 	if (Cell::ship == Sea::GetCell(point)) {
 		return { { first, second, false } };
@@ -58,41 +96,10 @@ std::optional<std::tuple<UINT, UINT, bool>> Manual::CheckUp(
 	else
 		return { { first, second, true } };
 }
-std::optional<Point> Manual::GetEndPointRaw(
-	const Direct_t direct,
-	Point point
+bool Manual::WrapperCell(
+	const Point point
 ) const {
-	auto optional{ GetPointRaw(direct, point) };
-	if (optional) {
-		point = optional.value();
-		if (Cell::sky == Sky::GetCell(point)) {
-			if (Cell::sea == Sea::GetCell(point)) {
-				return optional;
-			}
-			else {
-				return Point{};
-			}
-		}
-	}
-	return { Point{} };
-	/*
-	UINT max = GetMaxUINT();
-	(&point->*direct)();
-	if (point.IsNotNan(max)) {
-		while (Cell::blast == Sky::GetCell(point)) {
-			(&point->*direct)();
-			if (point.IsNan(max)) {
-				return Point{};
-			}
-		}
-		if (Cell::ship == Sea::GetCell(point)) {
-			return {};
-		}
-		else {
-			return point;
-		}
-
-	}
-	return Point{};
-	*/
+	auto optional = CompareCell(point);
+	return
+		optional ? optional.value() : false;
 }

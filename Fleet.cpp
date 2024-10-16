@@ -22,7 +22,7 @@ std::optional<std::pair<UINT, bool>> Fleet::Status() const {
 	}
 	return {};
 }
-std::optional<std::wstring> Fleet::Cancel() const {
+std::optional<std::wstring> Fleet::IsCancel() const {
 	if (auto check = Status(); check.has_value()) {
 		auto [level, diff] {check.value()};
 		std::wstring messing{ L"Too " };
@@ -38,28 +38,47 @@ std::optional<std::wstring> Fleet::Cancel() const {
 }
 void Fleet::Damage()
 {
-	if (target)
-		;
-	else
-		RandomHit();
+	if (target.count) {
+		if (SeriosHit())
+			Damage();
+	}
+	else {
+		if (RandomHit())
+			Damage();
+	}
 }
-bool Fleet::RandomHit() {
-	auto random = Sky::GetRandPoint(Cell::sky);
+bool Fleet::RandomHit(Point random) {
+	if (random.IsNan())
+		random = Sky::GetRandPoint(Cell::sky);
+
 	if (Cell::sea == Sea::GetCell(random)) {
-		Missle(random);
+		MissedCell(random);
 		return false;
 	}
 	else {
-		MissleCorner(random);
-		Blast(random);
-		if (auto points = LevelDown(random); points) {
-			MissleFace(points.value());
-			return true;
+		Sleep(1000);
+		MisledCorner(random);
+		BlastCell(random);
+		auto target { LevelDown(random) };
+		if (target.count) {
+			if (IsTarget(target)) {
+				Fleet::target = target;
+			}
+			else {
+				MisledFace(target);
+				Fleet::target.count = 0;
+			}
 		}
-		else {
-			;
-		}
+		return true;
 	}
+}
+bool Fleet::SeriosHit() {
+	UINT index = GetRandUINT(target.count - 1);
+	Point point{ target.points[index] };
+	target.points[index] = target.points[target.count - 1];
+	--target.count;
+
+	return RandomHit(point);
 }
 void Fleet::SetRanks(
 	const UINT first,
@@ -88,15 +107,18 @@ void Enemy::LButtonDown(
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
-		Missle(point);
+		MissedCell(point);
 		ReturnedFire();
 		return;
 	}
 	else {
-		Blast(point);
-		MissleCorner(point);
-		if (auto points = LevelDown(point); points)
-			MissleFace(points.value());
+		BlastCell(point);
+		MisledCorner(point);
+		auto target { LevelDown(point) };
+		if (target.count) {
+			if (IsNotTarget(target))
+				MisledFace(target);
+		}
 		return;
 	}
 }
@@ -116,34 +138,3 @@ Cell Allies::GetCell(
 ) const {
 	return Sea::GetCell(point);
 }
-/*
-void Allies::EnemyShot(
-	std::optional<Point> point
-) {
-	enum Direct {
-		up,
-		down,
-		left,
-		right
-	};
-	if (point) {
-		;
-	}
-	else {
-		auto random = Sky::GetRandPoint(Cell::sky);
-		if (Cell::sea == Sea::GetCell(random)) {
-			Missle(random);
-			return;
-		}
-		else if (Cell::ship == Sea::GetCell(random)) {
-			Missle(random);
-			MissleCorner(random);
-			if (auto points = LevelDown(random); points) {
-				MissleFace(points.value());
-				return EnemyShot();
-			}
-			return EnemyShot(random);
-		}
-	}
-}
-*/

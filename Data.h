@@ -34,7 +34,10 @@ namespace domain {
 	};
 
 	static UINT GetRandUINT(const UINT max) {
-		return std::rand() / (RAND_MAX / max);
+		if (max)
+			return std::rand() / (RAND_MAX / max);
+		else
+			return 0;
 	}
 	static UINT GetRandBool() {
 		return GetRandUINT(2);
@@ -63,15 +66,15 @@ namespace domain {
 		bool IsNotNan() const;
 		bool IsNotNan(const UINT max) const;
 
-		Point& Up();
-		Point& Down();
-		Point& Left();
-		Point& Right();
+		Point& North();
+		Point& South();
+		Point& West();
+		Point& East();
 
-		Point Up() const;
-		Point Down() const;
-		Point Left() const;
-		Point Right() const;
+		Point North() const;
+		Point South() const;
+		Point West() const;
+		Point East() const;
 	};
 
 	class Data {
