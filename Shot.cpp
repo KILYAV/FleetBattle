@@ -21,38 +21,38 @@ void Shot::Blast(
 ) {
 	SetCell(point, Cell::blast);
 }
-void Shot::Missle(
+void Shot::Missed(
 	const Point point
 ) {
 	SetCell(point, Cell::missle);
 }
-void Shot::MissleCorner(
+void Shot::MisledCorner(
 	const Point point
 ) {
 	UINT max = GetMaxUINT();
 	if (Point next{ point.Up().Left() }; next.IsNotNan(max))
-		Missle(next);
+		Missed(next);
 	if (Point next{ point.Up().Right() }; next.IsNotNan(max))
-		Missle(next);
+		Missed(next);
 	if (Point next{ point.Down().Left() }; next.IsNotNan(max))
-		Missle(next);
+		Missed(next);
 	if (Point next{ point.Down().Right() }; next.IsNotNan(max))
-		Missle(next);
+		Missed(next);
 }
-void Shot::MissleFace(
+void Shot::MisledFace(
 	const std::tuple<Point, Point, Point, Point> points
 ) {
 	UINT max = GetMaxUINT();
 	if (std::get<up>(points).IsNotNan(max)) {
-		Missle(std::get<up>(points));
+		Missed(std::get<up>(points));
 	}
 	if (std::get<down>(points).IsNotNan(max)) {
-		Missle(std::get<down>(points));
+		Missed(std::get<down>(points));
 	}
 	if (std::get<left>(points).IsNotNan(max)) {
-		Missle(std::get<left>(points));
+		Missed(std::get<left>(points));
 	}
 	if (std::get<right>(points).IsNotNan(max)) {
-		Missle(std::get<right>(points));
+		Missed(std::get<right>(points));
 	}
 }

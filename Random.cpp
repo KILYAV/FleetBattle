@@ -61,15 +61,14 @@ UINT Random::GetOffset(
 	delta = GetRandUINT(delta + 1);
 	return delta;
 }
-enum Direct {
-	up,
-	left,
-	ver,
-	hor
-};
 std::tuple<Point, UINT, UINT, UINT, UINT> Random::GetPointRaw(
 	const Level level
 ) const {
+	constexpr UINT up = 0;
+	constexpr UINT left = 1;
+	constexpr UINT ver = 2;
+	constexpr UINT hor = 3;
+
 	Point center;
 	std::tuple<UINT, UINT, UINT, UINT> tuple;
 	do {

@@ -74,25 +74,5 @@ std::optional<Point> Manual::GetEndPointRaw(
 			}
 		}
 	}
-	return { Point{} };
-	/*
-	UINT max = GetMaxUINT();
-	(&point->*direct)();
-	if (point.IsNotNan(max)) {
-		while (Cell::blast == Sky::GetCell(point)) {
-			(&point->*direct)();
-			if (point.IsNan(max)) {
-				return Point{};
-			}
-		}
-		if (Cell::ship == Sea::GetCell(point)) {
-			return {};
-		}
-		else {
-			return point;
-		}
-
-	}
 	return Point{};
-	*/
 }

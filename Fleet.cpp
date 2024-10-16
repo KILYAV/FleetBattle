@@ -46,14 +46,14 @@ void Fleet::Damage()
 bool Fleet::RandomHit() {
 	auto random = Sky::GetRandPoint(Cell::sky);
 	if (Cell::sea == Sea::GetCell(random)) {
-		Missle(random);
+		Missed(random);
 		return false;
 	}
 	else {
-		MissleCorner(random);
+		MisledCorner(random);
 		Blast(random);
 		if (auto points = LevelDown(random); points) {
-			MissleFace(points.value());
+			MisledFace(points.value());
 			return true;
 		}
 		else {
@@ -88,15 +88,15 @@ void Enemy::LButtonDown(
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
-		Missle(point);
+		Missed(point);
 		ReturnedFire();
 		return;
 	}
 	else {
 		Blast(point);
-		MissleCorner(point);
+		MisledCorner(point);
 		if (auto points = LevelDown(point); points)
-			MissleFace(points.value());
+			MisledFace(points.value());
 		return;
 	}
 }

@@ -19,13 +19,13 @@ namespace shot {
 		void Blast(
 			const Point point
 		);
-		void Missle(
+		void Missed(
 			const Point point
 		);
-		void MissleCorner(
+		void MisledCorner(
 			const Point point
 		);
-		void MissleFace(
+		void MisledFace(
 			const std::tuple<Point, Point, Point, Point>
 		);
 	private:

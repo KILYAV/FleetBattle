@@ -100,13 +100,12 @@ UINT Compare::GetLengthRaw(
 	UINT max = GetMaxUINT();
 	UINT count{ 0 };
 	(&point->*direct_f)();
-	if (point.IsNotNan(max))
-		while ((this->*compare_f)(point)) {
-			++count;
+	for (; point.IsNotNan(max); ++count) {
+		if ((this->*compare_f)(point))
 			(&point->*direct_f)();
-			if (point.IsNan(max))
-				return count;
-		}
+		else
+			return count;
+	}
 	return count;
 }
 std::optional<Point> Compare::GetPointRaw(
@@ -115,14 +114,11 @@ std::optional<Point> Compare::GetPointRaw(
 ) const {
 	UINT max = GetMaxUINT();
 	(&point->*direct_f)();
-	if (point.IsNotNan(max)) {
-		while (Cell::blast == Sky::GetCell(point)) {
+	while (point.IsNotNan(max)) {
+		if (Cell::blast == Sky::GetCell(point))
 			(&point->*direct_f)();
-			if (point.IsNan(max)) {
-				return Point{};
-			}
-		}
-		return point;
+		else
+			return point;
 	}
 	return {};
 }
