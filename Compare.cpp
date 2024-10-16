@@ -84,4 +84,37 @@ bool Compare::CompareSquare(
 ) const {
 	return
 		CompareCorner(point) || CompareFace(point);
+<<<<<<< HEAD
+=======
+}
+UINT Compare::GetLengthRaw(
+	const Compare_t compare_f,
+	const Direct_t direct_f,
+	Point point
+) const {
+	UINT max = GetMaxUINT();
+	UINT count{ 0 };
+	(&point->*direct_f)();
+	for (; point.IsNotNan(max); ++count) {
+		if ((this->*compare_f)(point))
+			(&point->*direct_f)();
+		else
+			return count;
+	}
+	return count;
+}
+std::optional<Point> Compare::GetPointRaw(
+	const Direct_t direct_f,
+	Point point
+) const {
+	UINT max = GetMaxUINT();
+	(&point->*direct_f)();
+	while (point.IsNotNan(max)) {
+		if (Cell::blast == Sky::GetCell(point))
+			(&point->*direct_f)();
+		else
+			return point;
+	}
+	return {};
+>>>>>>> refs/remotes/origin/master
 }

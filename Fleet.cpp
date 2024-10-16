@@ -52,6 +52,7 @@ bool Fleet::RandomHit(Point random) {
 		random = Sky::GetRandPoint(Cell::sky);
 
 	if (Cell::sea == Sea::GetCell(random)) {
+<<<<<<< HEAD
 		MissedCell(random);
 		return false;
 	}
@@ -68,6 +69,20 @@ bool Fleet::RandomHit(Point random) {
 				MisledFace(target);
 				Fleet::target.count = 0;
 			}
+=======
+		Missed(random);
+		return false;
+	}
+	else {
+		MisledCorner(random);
+		Blast(random);
+		if (auto points = LevelDown(random); points) {
+			MisledFace(points.value());
+			return true;
+		}
+		else {
+			;
+>>>>>>> refs/remotes/origin/master
 		}
 		return true;
 	}
@@ -107,11 +122,16 @@ void Enemy::LButtonDown(
 		return;
 	}
 	else if (Cell::sea == Sea::GetCell(point)) {
+<<<<<<< HEAD
 		MissedCell(point);
+=======
+		Missed(point);
+>>>>>>> refs/remotes/origin/master
 		ReturnedFire();
 		return;
 	}
 	else {
+<<<<<<< HEAD
 		BlastCell(point);
 		MisledCorner(point);
 		auto target { LevelDown(point) };
@@ -119,6 +139,12 @@ void Enemy::LButtonDown(
 			if (IsNotTarget(target))
 				MisledFace(target);
 		}
+=======
+		Blast(point);
+		MisledCorner(point);
+		if (auto points = LevelDown(point); points)
+			MisledFace(points.value());
+>>>>>>> refs/remotes/origin/master
 		return;
 	}
 }

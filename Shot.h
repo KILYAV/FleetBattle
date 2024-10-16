@@ -21,14 +21,22 @@ namespace shot {
 		void BlastCell(
 			const Point point
 		);
+<<<<<<< HEAD
 		void MissedCell(
+=======
+		void Missed(
+>>>>>>> refs/remotes/origin/master
 			const Point point
 		);
 		void MisledCorner(
 			const Point point
 		);
 		void MisledFace(
+<<<<<<< HEAD
 			const Target_t& target
+=======
+			const std::tuple<Point, Point, Point, Point>
+>>>>>>> refs/remotes/origin/master
 		);
 		bool IsTarget(
 			const Target_t& target
