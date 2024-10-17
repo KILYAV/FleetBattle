@@ -56,7 +56,7 @@ bool Fleet::RandomHit(Point random) {
 		return false;
 	}
 	else {
-		Sleep(1000);
+		Sleep(300);
 		MisledCorner(random);
 		BlastCell(random);
 		auto target { LevelDown(random) };
