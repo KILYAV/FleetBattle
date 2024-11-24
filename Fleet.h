@@ -14,13 +14,15 @@ namespace fleet {
 	protected:
 		Fleet(const HWND hWnd, const IDC IDC_FRAME);
 
-		std::optional<std::pair<UINT, bool>> Status() const;
+		std::optional<std::pair<UINT, bool>> IsComplete() const;
 		std::optional<std::wstring> IsCancel() const;
 
-		void Damage();
+		bool IsLoss() const;
+		
+		bool Damage();
 	private:
-		bool SeriosHit();
-		bool RandomHit(Point point = Point{});
+		bool SeriesHit();
+		std::optional<bool> RandomHit(Point point = Point{});
 
 		void SetRanks (
 			const UINT first,
@@ -35,7 +37,6 @@ namespace fleet {
 		std::vector<UINT> ranks;
 		Target_t target;
 	};
-
 	class Enemy :
 		virtual Data,
 		protected Fleet
@@ -47,7 +48,7 @@ namespace fleet {
 
 		void LButtonDown(const LPARAM lParam) override;
 
-		virtual void ReturnedFire() = 0;
+		virtual bool ReturnedFire() = 0;
 	private:
 		Cell GetCell(
 			const Point point

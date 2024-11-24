@@ -10,7 +10,7 @@ Fleet::Fleet(
 {
 	ranks.resize(GetLevelUINT());
 }
-std::optional<std::pair<UINT, bool>> Fleet::Status() const {
+std::optional<std::pair<UINT, bool>> Fleet::IsComplete() const {
 	auto max{ GetLevelUINT() };
 	for (UINT index = 0, size = ranks.size(); index < size; ++index) {
 		if (ranks[index] == max) {
@@ -23,7 +23,7 @@ std::optional<std::pair<UINT, bool>> Fleet::Status() const {
 	return {};
 }
 std::optional<std::wstring> Fleet::IsCancel() const {
-	if (auto check = Status(); check.has_value()) {
+	if (auto check = IsComplete(); check.has_value()) {
 		auto [level, diff] {check.value()};
 		std::wstring messing{ L"Too " };
 		if (diff)
@@ -36,10 +36,18 @@ std::optional<std::wstring> Fleet::IsCancel() const {
 	else
 		return {};
 }
-void Fleet::Damage()
+bool Fleet::IsLoss() const {
+	UINT total{ 0 };
+	for (auto count : ranks) {
+		total += count;
+	}
+	return
+		false == static_cast<bool>(total);
+}
+bool Fleet::Damage()
 {
 	if (target.count) {
-		if (SeriosHit())
+		if (SeriesHit())
 			Damage();
 	}
 	else {
@@ -47,13 +55,13 @@ void Fleet::Damage()
 			Damage();
 	}
 }
-bool Fleet::RandomHit(Point random) {
+std::optional<bool> Fleet::RandomHit(Point random) {
 	if (random.IsNan())
 		random = Sky::GetRandPoint(Cell::sky);
 
 	if (Cell::sea == Sea::GetCell(random)) {
 		MissedCell(random);
-		return false;
+		return {};
 	}
 	else {
 		Sleep(300);
@@ -72,7 +80,7 @@ bool Fleet::RandomHit(Point random) {
 		return true;
 	}
 }
-bool Fleet::SeriosHit() {
+bool Fleet::SeriesHit() {
 	UINT index = GetRandUINT(target.count - 1);
 	Point point{ target.points[index] };
 	target.points[index] = target.points[target.count - 1];

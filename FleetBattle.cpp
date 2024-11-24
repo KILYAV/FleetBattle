@@ -33,6 +33,6 @@ void FleetBattle::Random() {
 	Allies::Order();
 	Allies::Frame::Fill();
 }
-void FleetBattle::ReturnedFire() {
+bool FleetBattle::ReturnedFire() {
 	Allies::Damage();
 }
